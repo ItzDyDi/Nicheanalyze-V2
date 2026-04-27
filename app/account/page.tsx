@@ -1,0 +1,190 @@
+"use client";
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+
+export default function AccountPage() {
+  const { data: session, status, update } = useSession();
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+
+  useEffect(() => {
+    if (status === "unauthenticated") router.push("/auth/login");
+  }, [status, router]);
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#FF1654] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!session) return null;
+
+  const userImage = (session.user as { image?: string | null }).image;
+  const userEmail = session.user?.email ?? "";
+  const initial = userEmail[0]?.toUpperCase() ?? "U";
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadError("");
+    setUploading(true);
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    const res = await fetch("/api/user/avatar", { method: "POST", body: formData });
+    const data = await res.json();
+
+    if (!res.ok) {
+      setUploadError(data.error ?? "Erreur lors de l'upload");
+    } else {
+      await update({ image: data.imageUrl });
+    }
+    setUploading(false);
+    // Reset input so same file can be re-selected
+    e.target.value = "";
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-900 py-12 px-4">
+      <div className="max-w-2xl mx-auto space-y-6">
+
+        <div>
+          <h1 className="text-2xl font-bold text-white">Mon compte</h1>
+          <p className="text-gray-400 text-sm mt-1">Gérez vos informations personnelles</p>
+        </div>
+
+        {/* Profile card */}
+        <div className="bg-gray-800 rounded-2xl border border-gray-700 p-6 space-y-4">
+          <div className="flex items-center gap-4">
+
+            {/* Avatar with upload */}
+            <div className="relative group">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="relative w-16 h-16 rounded-full overflow-hidden focus:outline-none"
+                title="Changer la photo"
+                disabled={uploading}
+              >
+                {userImage ? (
+                  <Image
+                    src={userImage}
+                    alt="Avatar"
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="w-full h-full bg-[#FF1654]/20 flex items-center justify-center text-2xl font-bold text-[#FF1654]">
+                    {initial}
+                  </div>
+                )}
+
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  {uploading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <span className="text-white text-lg">📷</span>
+                  )}
+                </div>
+              </button>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarChange}
+              />
+            </div>
+
+            <div>
+              <p className="text-white font-semibold">{session.user?.name ?? "Utilisateur"}</p>
+              <p className="text-gray-400 text-sm">{userEmail}</p>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="text-xs text-[#FF1654] hover:underline mt-0.5"
+                disabled={uploading}
+              >
+                {uploading ? "Upload en cours..." : "Changer la photo"}
+              </button>
+            </div>
+          </div>
+
+          {uploadError && (
+            <p className="text-red-400 text-sm">{uploadError}</p>
+          )}
+
+          <div className="border-t border-gray-700 pt-4 space-y-3">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Email</span>
+              <span className="text-white">{userEmail}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Plan actuel</span>
+              <span className="font-bold" style={{ color: "#94a3b8" }}>Free</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Recherches / jour</span>
+              <span className="text-white">5</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Vidéos / recherche</span>
+              <span className="text-white">10 max</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Export</span>
+              <span className="text-gray-500">Non inclus</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="bg-gray-800 rounded-2xl border border-gray-700 p-6 space-y-3">
+          <h2 className="text-white font-semibold mb-4">Accès rapide</h2>
+          <Link
+            href="/dashboard/search"
+            className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-700 transition-colors group"
+          >
+            <span className="text-gray-300 group-hover:text-white text-sm">🔍 Recherche TikTok</span>
+            <span className="text-gray-500 text-xs">→</span>
+          </Link>
+          <Link
+            href="/billing"
+            className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-700 transition-colors group"
+          >
+            <span className="text-gray-300 group-hover:text-white text-sm">💳 Abonnement & facturation</span>
+            <span className="text-gray-500 text-xs">→</span>
+          </Link>
+          <Link
+            href="/pricing"
+            className="flex items-center justify-between p-3 rounded-xl transition-colors group"
+            style={{ background: "rgba(255,22,84,0.06)", border: "1px solid rgba(255,22,84,0.2)" }}
+          >
+            <div>
+              <span className="text-sm font-bold" style={{ color: "#FF1654" }}>⭐ Upgrade vers Pro — 4,99€/mois</span>
+              <p className="text-gray-500 text-xs mt-0.5">50 recherches/jour · 50 vidéos · Export CSV</p>
+            </div>
+            <span className="text-gray-500 text-xs">→</span>
+          </Link>
+        </div>
+
+        {/* Logout */}
+        <button
+          onClick={() => signOut({ callbackUrl: "/" })}
+          className="w-full py-3 border border-red-500/30 text-red-400 rounded-xl hover:bg-red-500/10 transition-colors text-sm font-medium"
+        >
+          Se déconnecter
+        </button>
+      </div>
+    </div>
+  );
+}
