@@ -35,8 +35,8 @@ export default function Header() {
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 text-lg font-bold text-white shrink-0">
-          🐾 <span><span className="text-[#FF1654]">Niche</span>Analyze</span>
+        <Link href="/" className="flex items-center shrink-0">
+          <Image src="/logo.jpg" alt="NicheAnalyze" width={160} height={40} className="object-contain rounded-lg" priority />
         </Link>
 
         {/* Desktop nav */}

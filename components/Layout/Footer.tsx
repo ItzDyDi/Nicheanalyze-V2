@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const LINKS = {
   Produit: [
@@ -27,8 +28,8 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-10">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="inline-flex items-center gap-1.5 text-white font-bold text-lg mb-3">
-              🐾 <span><span className="text-[#FF1654]">Niche</span>Analyze</span>
+            <Link href="/" className="inline-flex items-center mb-3">
+              <Image src="/logo.jpg" alt="NicheAnalyze" width={130} height={32} className="object-contain rounded-md" />
             </Link>
             <p className="text-gray-500 text-xs leading-relaxed">
               Analyze what WORKS<br />on TikTok.

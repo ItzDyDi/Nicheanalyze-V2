@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { PLANS, FEATURE_ROWS } from "@/lib/plan-limits";
 import CheckoutButton from "@/components/Pricing/CheckoutButton";
 
@@ -68,6 +69,14 @@ export default function PricingPage() {
 
                 {/* Header */}
                 <div className="mb-5">
+                  {key !== "free" && (
+                    <Image
+                      src={key === "pro" ? "/icone-pro.jpg" : "/icone-premium.jpg"}
+                      alt={plan.label}
+                      width={48} height={48}
+                      className="rounded-xl mb-3 object-contain"
+                    />
+                  )}
                   <h2 className="text-lg font-bold text-white mb-0.5">{plan.label}</h2>
                   <p className="text-xs text-gray-400 mb-4">{plan.description}</p>
                   <div className="flex items-baseline gap-1 mt-2 mb-3">
