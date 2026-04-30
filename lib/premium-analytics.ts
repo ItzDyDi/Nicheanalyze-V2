@@ -16,6 +16,7 @@ export interface VideoScore {
 export interface Pattern {
   title: string;
   description: string;
+  tip: string;
   icon: string;
   color: string;
   impact: "high" | "medium" | "low";
@@ -139,7 +140,15 @@ export function detectPatterns(videos: ScrapedVideo[]): Pattern[] {
     if (sAvg > lAvg * 1.1) {
       patterns.push({
         title: `Vidéos ≤30s → +${Math.round((sAvg / lAvg - 1) * 100)}% d'engagement`,
-        description: `Les courtes vidéos (≤30s) génèrent ${sAvg.toFixed(1)}% d'engagement vs ${lAvg.toFixed(1)}% pour les longues.`,
+        description: `Les courtes vidéos (≤30s) génèrent ${sAvg.toFixed(1)}% d'engagement vs ${lAvg.toFixed(1)}% pour les longues dans cette niche.`,
+        tip: `Compresse tes vidéos sous 30s : coupe l'intro, va droit au but, garde uniquement la partie la plus impactante.`,
+        icon: "⚡", color: "#FF1654", impact: "high",
+      });
+    } else if (lAvg > sAvg * 1.1) {
+      patterns.push({
+        title: `Vidéos longues (>30s) → +${Math.round((lAvg / sAvg - 1) * 100)}% d'engagement`,
+        description: `Dans cette niche, les formats plus longs retiennent mieux l'audience (${lAvg.toFixed(1)}% vs ${sAvg.toFixed(1)}%).`,
+        tip: `Développe ton contenu sur 45-60s : intro accrocheuse, corps instructif, conclusion avec CTA.`,
         icon: "⚡", color: "#FF1654", impact: "high",
       });
     }
@@ -154,13 +163,16 @@ export function detectPatterns(videos: ScrapedVideo[]): Pattern[] {
   });
   const types = Object.entries(typeMap)
     .filter(([, d]) => d.eng.length >= 2)
-    .map(([type, d]) => ({ type, avgEng: d.eng.reduce((a,b)=>a+b,0)/d.eng.length }))
+    .map(([type, d]) => ({ type, avgEng: d.eng.reduce((a,b)=>a+b,0)/d.eng.length, avgViews: d.views.reduce((a,b)=>a+b,0)/d.views.length }))
     .sort((a, b) => b.avgEng - a.avgEng);
   if (types.length >= 2) {
     const best = types[0];
+    const worst = types[types.length - 1];
+    const fmtViews = (n: number) => n >= 1_000_000 ? `${(n/1_000_000).toFixed(1)}M` : `${(n/1000).toFixed(0)}k`;
     patterns.push({
-      title: `Format "${best.type.replace("-"," ")}" domine la niche`,
-      description: `Engagement moyen de ${best.avgEng.toFixed(1)}% — meilleur de tous les formats analysés.`,
+      title: `Format "${best.type.replace("-"," ")}" domine — ${best.avgEng.toFixed(1)}% d'engagement`,
+      description: `Ce format surperforme tous les autres (${fmtViews(best.avgViews)} vues moy.). "${worst.type.replace("-"," ")}" est le moins efficace (${worst.avgEng.toFixed(1)}%).`,
+      tip: `Concentre-toi sur le format "${best.type.replace("-"," ")}" et évite "${worst.type.replace("-"," ")}" — c'est ce que l'algorithme favorise dans cette niche.`,
       icon: "🎯", color: "#00D9FF", impact: "high",
     });
   }
@@ -171,10 +183,16 @@ export function detectPatterns(videos: ScrapedVideo[]): Pattern[] {
   if (withTags.length >= 2 && withoutTags.length >= 2) {
     const wAvg  = withTags.reduce((s, v) => s + v.views, 0) / withTags.length;
     const woAvg = withoutTags.reduce((s, v) => s + v.views, 0) / withoutTags.length;
-    if (wAvg > woAvg) {
+    if (wAvg > woAvg * 1.05) {
+      const topTags = (() => {
+        const tc: Record<string, number> = {};
+        withTags.forEach(v => v.hashtags.forEach(h => { tc[h] = (tc[h] ?? 0) + 1; }));
+        return Object.entries(tc).sort((a,b) => b[1]-a[1]).slice(0,3).map(([t]) => t).join(", ");
+      })();
       patterns.push({
-        title: `3+ hashtags = ${Math.round((wAvg / woAvg - 1) * 100)}% de vues en plus`,
-        description: `Vidéos avec 3+ hashtags: ${Math.round(wAvg).toLocaleString()} vues en moyenne vs ${Math.round(woAvg).toLocaleString()}.`,
+        title: `3+ hashtags = +${Math.round((wAvg / woAvg - 1) * 100)}% de vues`,
+        description: `Les vidéos bien hashtagées atteignent ${Math.round(wAvg/1000)}k vues en moyenne vs ${Math.round(woAvg/1000)}k sans.`,
+        tip: `Utilise systématiquement ces hashtags qui reviennent chez les top créateurs : ${topTags}.`,
         icon: "#️⃣", color: "#a78bfa", impact: "medium",
       });
     }
@@ -187,20 +205,46 @@ export function detectPatterns(videos: ScrapedVideo[]): Pattern[] {
     const eAvg  = emotional.reduce((s, v) => s + v.engagementRate, 0) / emotional.length;
     const neAvg = nonEmotional.reduce((s, v) => s + v.engagementRate, 0) / nonEmotional.length;
     if (eAvg > neAvg * 1.1) {
+      const topHook = emotional.sort((a,b) => b.engagementRate - a.engagementRate)[0];
       patterns.push({
-        title: `Hooks émotionnels: +${Math.round((eAvg / neAvg - 1) * 100)}% d'engagement`,
-        description: `Les mots forts (secret, incroyable, jamais vu…) boostent significativement l'engagement.`,
+        title: `Hooks émotionnels → +${Math.round((eAvg / neAvg - 1) * 100)}% d'engagement`,
+        description: `Les hooks avec mots forts génèrent ${eAvg.toFixed(1)}% vs ${neAvg.toFixed(1)}% pour les hooks neutres.`,
+        tip: `Exemple de hook qui performe : "${topHook.hook.slice(0, 60)}${topHook.hook.length > 60 ? "…" : ""}". Commence toujours par un mot choc : incroyable, secret, jamais vu…`,
         icon: "🧠", color: "#f59e0b", impact: "medium",
       });
     }
   }
 
+  // Top creator pattern
+  const creatorMap: Record<string, { views: number[]; eng: number[] }> = {};
+  videos.forEach(v => {
+    if (!creatorMap[v.creatorHandle]) creatorMap[v.creatorHandle] = { views: [], eng: [] };
+    creatorMap[v.creatorHandle].views.push(v.views);
+    creatorMap[v.creatorHandle].eng.push(v.engagementRate);
+  });
+  const topCreators = Object.entries(creatorMap)
+    .filter(([, d]) => d.views.length >= 2)
+    .map(([handle, d]) => ({ handle, avgViews: d.views.reduce((a,b)=>a+b,0)/d.views.length, avgEng: d.eng.reduce((a,b)=>a+b,0)/d.eng.length }))
+    .sort((a, b) => b.avgViews - a.avgViews);
+  if (topCreators.length >= 2) {
+    const top = topCreators[0];
+    const fmtV = (n: number) => n >= 1_000_000 ? `${(n/1_000_000).toFixed(1)}M` : `${(n/1000).toFixed(0)}k`;
+    patterns.push({
+      title: `@${top.handle} domine avec ${fmtV(top.avgViews)} vues/vidéo`,
+      description: `Ce créateur cumule ${top.avgViews >= 1000 ? fmtV(top.avgViews) : top.avgViews} vues moyennes et ${top.avgEng.toFixed(1)}% d'engagement — le benchmark de ta niche.`,
+      tip: `Analyse les vidéos de @${top.handle} : son format, ses hooks, sa durée. C'est la référence à reproduire dans cette niche.`,
+      icon: "👑", color: "#f59e0b", impact: top.avgEng >= 5 ? "high" : "medium",
+    });
+  }
+
   // Viral signal
   const viral = videos.filter(v => v.engagementRate >= 5);
   if (viral.length > 0) {
+    const avgViral = viral.reduce((s,v) => s + v.engagementRate, 0) / viral.length;
     patterns.push({
       title: `${Math.round((viral.length / videos.length) * 100)}% des vidéos ont un engagement exceptionnel`,
-      description: `${viral.length} vidéo${viral.length > 1 ? "s" : ""} dépassent 5% d'engagement — niche très active.`,
+      description: `${viral.length} vidéo${viral.length > 1 ? "s" : ""} dépassent 5% d'engagement (moy. ${avgViral.toFixed(1)}%) — niche très active.`,
+      tip: `La barre est haute ici. Pour percer, vise minimum 5% d'engagement : pose une question dans ton hook, réponds aux commentaires vite, publie aux heures de pointe.`,
       icon: "🔥", color: "#10b981", impact: viral.length >= 3 ? "high" : "medium",
     });
   }

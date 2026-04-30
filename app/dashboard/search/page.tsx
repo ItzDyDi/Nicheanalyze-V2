@@ -11,11 +11,11 @@ import { TOOLTIPS } from "@/lib/tooltip-data";
 import { analyzeVideo } from "@/lib/video-analyzer";
 import dynamic from "next/dynamic";
 import {
-  PatternsSection, RecommendationsSection, BenchmarkSection,
+  PatternsSection, RecommendationsSection,
 } from "@/components/Premium/InsightsPanel";
 import {
   analyzeVideoAdvanced, detectPatterns, generateRecommendations,
-  computeChartData, getBenchmark,
+  computeChartData,
 } from "@/lib/premium-analytics";
 
 const AnalyticsCharts = dynamic(() => import("@/components/Premium/AnalyticsCharts"), { ssr: false });
@@ -516,7 +516,6 @@ function PremiumSection({ videos }: { videos: ScrapedVideo[] }) {
   const chartData     = computeChartData(videos);
   const patterns      = detectPatterns(videos);
   const recs          = generateRecommendations(videos);
-  const bench         = getBenchmark(videos);
   const top3          = [...videos].sort((a, b) => b.engagementRate - a.engagementRate).slice(0, 3);
 
   return (
@@ -536,9 +535,6 @@ function PremiumSection({ videos }: { videos: ScrapedVideo[] }) {
       <div className="p-6 space-y-6">
         {/* Charts */}
         <AnalyticsCharts data={chartData} />
-
-        {/* Benchmark */}
-        <BenchmarkSection bench={bench} />
 
         {/* Patterns */}
         <PatternsSection patterns={patterns} />

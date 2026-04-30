@@ -28,14 +28,18 @@ export function PatternsSection({ patterns }: { patterns: Pattern[] }) {
       <p className="text-white font-bold text-sm mb-4">🔍 Patterns détectés dans ta niche</p>
       <div className="space-y-3">
         {patterns.map((p) => (
-          <div key={p.title} className="flex items-start gap-3 p-3 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-            <span className="text-xl shrink-0">{p.icon}</span>
+          <div key={p.title} className="flex items-start gap-3 p-4 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${p.color}22` }}>
+            <span className="text-xl shrink-0 mt-0.5">{p.icon}</span>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap mb-1">
+              <div className="flex items-center gap-2 flex-wrap mb-1.5">
                 <p className="text-sm font-bold text-white">{p.title}</p>
                 <ImpactBadge impact={p.impact} />
               </div>
-              <p className="text-xs text-gray-400 leading-relaxed">{p.description}</p>
+              <p className="text-xs text-gray-400 leading-relaxed mb-2">{p.description}</p>
+              <div className="flex items-start gap-1.5 rounded-lg px-3 py-2" style={{ background: `${p.color}12`, border: `1px solid ${p.color}25` }}>
+                <span className="text-xs shrink-0 mt-0.5">💡</span>
+                <p className="text-xs leading-relaxed font-medium" style={{ color: p.color }}>{p.tip}</p>
+              </div>
             </div>
           </div>
         ))}
