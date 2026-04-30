@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { PLANS } from "@/lib/plan-limits";
 import { searchTikTok, calculateStats, getTopHashtags, getTopHooks } from "@/lib/tiktok-scraper";
 import { detectLanguage } from "@/lib/language-detector";
+import { checkRateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -9,8 +10,34 @@ export async function GET(request: Request) {
     return Response.json({ success: false, error: "Connexion requise" }, { status: 401 });
   }
 
+  const userId = (session.user as { id: string }).id;
   const plan = ((session.user as { plan?: string }).plan ?? "free") as "free" | "pro" | "premium";
   const planConfig = PLANS[plan];
+
+  // Rate limit : pas plus d'1 recherche / 3 secondes par utilisateur (anti-spam)
+  const burstCheck = checkRateLimit(`search-burst:${userId}`, 1, 3_000);
+  if (!burstCheck.allowed) {
+    return rateLimitResponse(burstCheck.resetAt, "Une recherche à la fois. Attends quelques secondes.");
+  }
+
+  // Rate limit : limite journalière selon le plan (en mémoire — approximatif)
+  const dailyLimit = plan === "free" ? 5 : plan === "pro" ? 50 : 500;
+  const dailyCheck = checkRateLimit(`search-daily:${userId}`, dailyLimit, 24 * 60 * 60 * 1000);
+  if (!dailyCheck.allowed) {
+    return rateLimitResponse(
+      dailyCheck.resetAt,
+      plan === "free"
+        ? "Limite de 5 recherches/jour atteinte. Upgrade vers Pro pour plus."
+        : "Limite journalière atteinte.",
+    );
+  }
+
+  // Rate limit IP : protection supplémentaire contre les comptes multiples
+  const ip = getClientIp(request);
+  const ipCheck = checkRateLimit(`search-ip:${ip}`, 100, 60 * 60 * 1000);
+  if (!ipCheck.allowed) {
+    return rateLimitResponse(ipCheck.resetAt, "Trop de recherches depuis cette adresse.");
+  }
 
   const { searchParams } = new URL(request.url);
   const keyword = searchParams.get("q") ?? "";
@@ -18,7 +45,6 @@ export async function GET(request: Request) {
   const niche = searchParams.get("niche") ?? "general";
   const langParam = searchParams.get("lang") as "fr" | "en" | "other" | null;
 
-  // Cap videos per search by plan limit
   const maxVideos = planConfig.videosPerSearch;
   const requested = Math.min(Number(searchParams.get("limit") ?? "20"), 50);
   const limit = Math.min(requested, maxVideos);
