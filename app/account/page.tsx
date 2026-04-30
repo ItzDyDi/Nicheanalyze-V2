@@ -90,7 +90,17 @@ export default function AccountPage() {
 
         {/* Profile card */}
         <div className="bg-gray-800 rounded-2xl border border-gray-700 p-6 space-y-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 relative">
+            {/* Plan badge — coin haut droit */}
+            {plan !== "free" && (
+              <div className="absolute top-0 right-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+                style={{ background: plan === "premium" ? "rgba(0,217,255,0.12)" : "rgba(255,22,84,0.12)", border: `1px solid ${meta.color}40` }}>
+                {meta.icon && <Image src={meta.icon} alt={meta.label} width={20} height={20} className="object-contain rounded" />}
+                <span className="text-xs font-black tracking-wide" style={{ color: meta.color }}>
+                  {meta.label.toUpperCase()}
+                </span>
+              </div>
+            )}
 
             {/* Avatar with upload */}
             <div className="relative group">
