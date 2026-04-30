@@ -29,7 +29,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="inline-flex items-center mb-3">
-              <Image src="/logo.jpg" alt="NicheAnalyze" width={130} height={32} className="object-contain rounded-md" />
+              <Image src="/logo.png" alt="NicheAnalyze" width={130} height={32} className="object-contain rounded-md" />
             </Link>
             <p className="text-gray-500 text-xs leading-relaxed">
               Analyze what WORKS<br />on TikTok.

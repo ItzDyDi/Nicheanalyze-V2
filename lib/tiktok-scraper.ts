@@ -108,8 +108,8 @@ export async function searchTikTok(
   niche = "general",
   langOverride?: "fr" | "en" | "other"
 ): Promise<ScrapedVideo[]> {
-  const key = process.env.RAPIDAPI_KEY;
-  const host = process.env.RAPIDAPI_HOST;
+  const key = process.env.RAPIDAPI_KEY?.trim();
+  const host = process.env.RAPIDAPI_HOST?.trim();
 
   if (!key || !host) throw new Error("RAPIDAPI_KEY ou RAPIDAPI_HOST manquant dans .env.local");
 
