@@ -37,11 +37,11 @@ export interface VideoStats {
 
 function classifyContent(desc: string, hashtags: string[]): ContentTypeValue {
   const text = (desc + " " + hashtags.join(" ")).toLowerCase();
-  if (/(tutorial|how.?to|tuto|learn|astuce|tips?|guide|step|étape|appren)/i.test(text)) return "tutorial";
+  if (/(tutorial|how.?to|tuto|learn|astuce|tips?|guide|step|étape|appren|conseil|recette|méthode|comment faire)/i.test(text)) return "tutorial";
   if (/(cute|mignon|adorable|😍|🥺|aww|bébé|baby|puppy|kitten)/i.test(text)) return "cute-moment";
   if (/(trick|tour|trained|appris|skill|perform|dressage|training)/i.test(text)) return "trick";
   if (/(routine|day|life|vlog|lifestyle|quotidien|journée)/i.test(text)) return "lifestyle";
-  if (/(why|science|fact|truth|réalité|saviez|did.?you.?know|explication)/i.test(text)) return "educational";
+  if (/(why|science|fact|truth|réalité|saviez|did.?you.?know|explication|santé|bienfait|avantage|bénéfice|effet|pourquoi|comprendre)/i.test(text)) return "educational";
   if (/(funny|pov|when|reaction|lol|😂|🤣|hilarious|drôle)/i.test(text)) return "entertainment";
   return "other";
 }
