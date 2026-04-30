@@ -15,6 +15,9 @@ export default function CheckoutButton({ plan, label, className, style }: Props)
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
+  const userPlan = (session?.user as { plan?: string })?.plan ?? "free";
+  const isCurrent = userPlan === plan;
+
   async function handleClick() {
     if (status === "loading") return;
     if (!session) {
@@ -37,6 +40,17 @@ export default function CheckoutButton({ plan, label, className, style }: Props)
       alert("Une erreur est survenue. Réessaie ou contacte le support.");
       setLoading(false);
     }
+  }
+
+  if (isCurrent) {
+    return (
+      <div
+        className="block w-full text-center py-2.5 rounded-xl text-sm font-bold mb-6 cursor-default"
+        style={{ background: "rgba(255,255,255,0.08)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)" }}
+      >
+        ✓ Votre abonnement actuel
+      </div>
+    );
   }
 
   return (

@@ -196,7 +196,9 @@ function VideoCard({ video, rank }: { video: ScrapedVideo; rank: number }) {
 
 export default function SearchPage() {
   const { data: session } = useSession();
-  const isPremium = (session?.user as { plan?: string })?.plan === "premium";
+  const plan = (session?.user as { plan?: string })?.plan ?? "free";
+  const isPremium = plan === "premium";
+  const isPro = plan === "pro";
   const [keyword, setKeyword] = useState("");
   const [sortBy, setSortBy] = useState("views");
   const [results, setResults] = useState<ScrapedVideo[]>([]);
@@ -318,12 +320,22 @@ export default function SearchPage() {
         <div className="mb-4 flex items-center justify-between px-4 py-2.5 rounded-xl text-xs"
           style={{ background: "rgba(148,163,184,0.08)", border: "1px solid rgba(148,163,184,0.12)" }}>
           <span className="text-gray-400">
-            <span className="font-semibold text-gray-300">Plan Free</span>
-            {" · "}5 recherches/jour · 10 vidéos par recherche
+            <span className="font-semibold" style={{
+              color: isPremium ? "#00D9FF" : isPro ? "#FF1654" : "#94a3b8"
+            }}>
+              Plan {isPremium ? "Premium" : isPro ? "Pro" : "Free"}
+            </span>
+            {isPremium
+              ? " · Recherches illimitées · 100+ vidéos par recherche"
+              : isPro
+              ? " · 50 recherches/jour · 50 vidéos par recherche"
+              : " · 5 recherches/jour · 10 vidéos par recherche"}
           </span>
-          <a href="/pricing" className="font-semibold hover:underline" style={{ color: "#FF1654" }}>
-            ⭐ Upgrade
-          </a>
+          {!isPremium && (
+            <a href="/pricing" className="font-semibold hover:underline" style={{ color: "#FF1654" }}>
+              {isPro ? "⭐ Upgrade vers Premium" : "⭐ Upgrade vers Pro"}
+            </a>
+          )}
         </div>
 
         <div className="mb-6 pb-2 border-b border-gray-200" />
@@ -415,13 +427,64 @@ export default function SearchPage() {
             <PremiumSection videos={results} />
           ) : (
             <div className="relative rounded-2xl overflow-hidden" style={{ background: "#0d1117" }}>
-              {/* Blurred preview */}
-              <div className="blur-sm pointer-events-none select-none p-6 space-y-4 opacity-40">
-                <div className="h-6 w-48 rounded bg-gray-700" />
+              {/* Blurred preview — fake charts */}
+              <div className="blur-md pointer-events-none select-none p-6 space-y-4 opacity-60">
                 <div className="grid grid-cols-2 gap-4">
-                  {[0,1,2,3].map(i => <div key={i} className="h-48 rounded-xl bg-gray-800" />)}
+                  {/* Fake bar chart 1 */}
+                  <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <div className="h-4 w-36 rounded bg-gray-600 mb-1" />
+                    <div className="h-3 w-24 rounded bg-gray-700 mb-4" />
+                    <svg width="100%" height="130" viewBox="0 0 260 130">
+                      {[40,90,70,55,80].map((h, i) => (
+                        <rect key={i} x={10 + i * 50} y={130 - h} width={36} height={h} rx={4}
+                          fill={i === 1 ? "#FF1654" : "rgba(255,255,255,0.15)"} />
+                      ))}
+                      <line x1="0" y1="130" x2="260" y2="130" stroke="rgba(255,255,255,0.1)" />
+                    </svg>
+                  </div>
+                  {/* Fake bar chart 2 — vues par type */}
+                  <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <div className="h-4 w-40 rounded bg-gray-600 mb-1" />
+                    <div className="h-3 w-28 rounded bg-gray-700 mb-4" />
+                    <svg width="100%" height="130" viewBox="0 0 260 130">
+                      {[
+                        { h: 100, c: "#FF1654" }, { h: 65, c: "#00D9FF" }, { h: 85, c: "#a78bfa" },
+                        { h: 45, c: "#f59e0b" }, { h: 70, c: "#10b981" },
+                      ].map((b, i) => (
+                        <rect key={i} x={8 + i * 50} y={130 - b.h} width={38} height={b.h} rx={4} fill={b.c} fillOpacity={0.7} />
+                      ))}
+                      <line x1="0" y1="130" x2="260" y2="130" stroke="rgba(255,255,255,0.1)" />
+                    </svg>
+                  </div>
+                  {/* Fake scatter plot */}
+                  <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <div className="h-4 w-44 rounded bg-gray-600 mb-1" />
+                    <div className="h-3 w-32 rounded bg-gray-700 mb-4" />
+                    <svg width="100%" height="130" viewBox="0 0 260 130">
+                      {[[30,100],[60,70],[80,50],[100,40],[120,30],[140,80],[160,25],[180,60],[200,20],[220,45],[50,90],[90,55]].map(([x,y],i) => (
+                        <circle key={i} cx={x} cy={y} r={5} fill="#00D9FF" fillOpacity={0.75} />
+                      ))}
+                      <line x1="0" y1="130" x2="260" y2="130" stroke="rgba(255,255,255,0.1)" />
+                      <line x1="0" y1="0" x2="0" y2="130" stroke="rgba(255,255,255,0.1)" />
+                    </svg>
+                  </div>
+                  {/* Fake line chart */}
+                  <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <div className="h-4 w-36 rounded bg-gray-600 mb-1" />
+                    <div className="h-3 w-24 rounded bg-gray-700 mb-4" />
+                    <svg width="100%" height="130" viewBox="0 0 260 130">
+                      <polyline points="10,110 50,80 90,95 130,50 170,65 210,30 250,45"
+                        fill="none" stroke="#FF1654" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <polyline points="10,120 50,100 90,115 130,85 170,90 210,70 250,75"
+                        fill="none" stroke="#00D9FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 2" />
+                      {[10,50,90,130,170,210,250].map((x,i) => {
+                        const ys = [110,80,95,50,65,30,45];
+                        return <circle key={i} cx={x} cy={ys[i]} r={3} fill="#FF1654" />;
+                      })}
+                      <line x1="0" y1="130" x2="260" y2="130" stroke="rgba(255,255,255,0.1)" />
+                    </svg>
+                  </div>
                 </div>
-                <div className="h-32 rounded-xl bg-gray-800" />
               </div>
               {/* Overlay */}
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
@@ -435,7 +498,9 @@ export default function SearchPage() {
                   className="px-6 py-2.5 rounded-xl text-sm font-bold text-white hover:brightness-110 transition"
                   style={{ background: "linear-gradient(135deg, #FF1654, #d4103c)" }}
                 >
-                  Upgrade vers Premium — 14,99€/mois →
+                  {isPro
+                    ? "⭐ Upgrade vers Premium — 14,99€/mois →"
+                    : "⭐ Essayer Pro ou Premium →"}
                 </a>
               </div>
             </div>

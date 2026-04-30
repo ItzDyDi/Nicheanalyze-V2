@@ -23,11 +23,24 @@ function ViralityMeter({ score }: { score: number }) {
 export default function PredictionCard({ videos }: { videos: ScrapedVideo[] }) {
   if (videos.length === 0) return null;
 
-  // Aggregate virality from top videos
+  // Score based on ALL videos — engagement moyen, vues moyennes, consistance
+  const avgEng  = videos.reduce((s, v) => s + v.engagementRate, 0) / videos.length;
+  const avgViews = videos.reduce((s, v) => s + v.views, 0) / videos.length;
+  const consistency = videos.filter(v => v.engagementRate >= 3).length / videos.length;
+
+  // Engagement: 1% → ~1, 3% → ~4, 6% → ~7, 10%+ → ~10
+  const engScore = Math.min(10, Math.max(1, avgEng * 0.85));
+  // Vues: 1k → ~1, 50k → ~4, 200k → ~6, 1M → ~8, 5M+ → ~10
+  const viewsScore = Math.min(10, Math.max(1, Math.log10(Math.max(1000, avgViews)) * 2.5 - 5));
+  // Consistance: % de vidéos au-dessus de 3% d'engagement
+  const consistScore = Math.min(10, consistency * 10);
+
+  const rawVirality = engScore * 0.4 + viewsScore * 0.35 + consistScore * 0.25;
+  const avgVirality = Math.round(Math.min(10, Math.max(1, rawVirality)));
+
+  // Keep top5 for detailed breakdown in ReasonLines
   const topVideos = [...videos].sort((a, b) => b.engagementRate - a.engagementRate).slice(0, 5);
   const scores = topVideos.map(v => analyzeVideoAdvanced(v));
-  const avgVirality = Math.round(scores.reduce((s, sc) => s + sc.virality, 0) / scores.length);
-  const avgViews = Math.round(videos.reduce((s, v) => s + v.views, 0) / videos.length);
 
   // Predict views range based on niche data
   const top25pct = [...videos].sort((a, b) => b.views - a.views).slice(0, Math.max(1, Math.ceil(videos.length * 0.25)));

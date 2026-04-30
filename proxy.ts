@@ -21,7 +21,7 @@ const PRIVATE_PREFIXES = ["/account", "/billing", "/dashboard"];
 // Routes API sensibles — exiger un User-Agent de navigateur
 const SENSITIVE_API = ["/api/auth/signup", "/api/auth/signin", "/api/search"];
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const ua = req.headers.get("user-agent") ?? "";
 

@@ -1,7 +1,7 @@
 "use client";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  ScatterChart, Scatter, Cell, Legend,
+  ScatterChart, Scatter, Cell, Legend, LineChart, Line,
 } from "recharts";
 import type { ChartData } from "@/lib/premium-analytics";
 
@@ -52,16 +52,16 @@ export default function AnalyticsCharts({ data }: { data: ChartData }) {
         </ResponsiveContainer>
       </ChartCard>
 
-      {/* Chart 2: Content type distribution */}
-      <ChartCard title="Types de contenu" subtitle="Répartition et vues moyennes par format">
+      {/* Chart 2: Vues moyennes par type de contenu */}
+      <ChartCard title="Vues par type de contenu" subtitle="Vues moyennes selon le format de vidéo">
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={data.contentTypes} margin={{ top: 0, right: 0, left: -10, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis dataKey="type" tick={{ fill: "#9ca3af", fontSize: 10 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false}
+              tickFormatter={(v: number) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
             <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 11, color: "#9ca3af" }} />
-            <Bar dataKey="count" name="Nb vidéos" radius={[4, 4, 0, 0]} maxBarSize={36}>
+            <Bar dataKey="avgViews" name="Vues moy." radius={[4, 4, 0, 0]} maxBarSize={40}>
               {data.contentTypes.map((_, i) => (
                 <Cell key={i} fill={COLORS[i % COLORS.length]} />
               ))}
@@ -70,22 +70,27 @@ export default function AnalyticsCharts({ data }: { data: ChartData }) {
         </ResponsiveContainer>
       </ChartCard>
 
-      {/* Chart 3: Hook quality vs engagement scatter */}
-      <ChartCard title="Hook quality vs Engagement" subtitle="Corrélation entre qualité du hook et taux d'engagement">
+      {/* Chart 3: Hook quality vs Vues */}
+      <ChartCard title="Hook quality vs Vues" subtitle="Corrélation entre qualité du hook et nombre de vues">
         <ResponsiveContainer width="100%" height={200}>
-          <ScatterChart margin={{ top: 0, right: 10, left: -20, bottom: 0 }}>
+          <ScatterChart margin={{ top: 0, right: 10, left: -10, bottom: 16 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-            <XAxis dataKey="hookScore" name="Hook score" type="number" domain={[0, 10]} tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} label={{ value: "Hook /10", position: "insideBottom", offset: -2, fill: "#6b7280", fontSize: 10 }} />
-            <YAxis dataKey="engagement" name="Engagement %" tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} unit="%" />
+            <XAxis dataKey="hookScore" name="Hook score" type="number" domain={[0, 10]}
+              tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false}
+              label={{ value: "Hook /10", position: "insideBottom", offset: -10, fill: "#6b7280", fontSize: 10 }} />
+            <YAxis dataKey="views" name="Vues" tick={{ fill: "#9ca3af", fontSize: 11 }}
+              axisLine={false} tickLine={false}
+              tickFormatter={(v: number) => v >= 1_000_000 ? `${(v/1_000_000).toFixed(1)}M` : v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
             <Tooltip
               cursor={{ strokeDasharray: "3 3", stroke: "rgba(255,255,255,0.1)" }}
               content={({ active, payload }) => {
                 if (!active || !payload?.length) return null;
                 const d = payload[0].payload;
+                const fmt = (n: number) => n >= 1_000_000 ? `${(n/1_000_000).toFixed(1)}M` : n >= 1000 ? `${(n/1000).toFixed(0)}k` : String(n);
                 return (
                   <div className="rounded-xl px-3 py-2 text-xs max-w-[200px]" style={{ background: "#1e2235", border: "1px solid rgba(255,255,255,0.12)" }}>
                     <p className="text-[#00D9FF] font-bold mb-1">Hook: {d.hookScore}/10</p>
-                    <p className="text-[#FF1654]">Engagement: {d.engagement}%</p>
+                    <p className="text-[#FF1654]">Vues: {fmt(d.views)}</p>
                     <p className="text-gray-400 mt-1 leading-snug">{d.label}</p>
                   </div>
                 );
@@ -96,7 +101,7 @@ export default function AnalyticsCharts({ data }: { data: ChartData }) {
         </ResponsiveContainer>
       </ChartCard>
 
-      {/* Chart 4: Views distribution */}
+      {/* Chart 4: Distribution des vues */}
       <ChartCard title="Distribution des vues" subtitle="Répartition des vidéos par tranche de vues">
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={data.viewsDistribution} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
@@ -110,6 +115,25 @@ export default function AnalyticsCharts({ data }: { data: ChartData }) {
               ))}
             </Bar>
           </BarChart>
+        </ResponsiveContainer>
+      </ChartCard>
+
+      {/* Chart 5: Courbe vues par type de contenu */}
+      <ChartCard title="Courbe vues × engagement par type" subtitle="Performance croisée selon le format">
+        <ResponsiveContainer width="100%" height={200}>
+          <LineChart data={data.contentTypes} margin={{ top: 0, right: 10, left: -10, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+            <XAxis dataKey="type" tick={{ fill: "#9ca3af", fontSize: 10 }} axisLine={false} tickLine={false} />
+            <YAxis yAxisId="left" tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false}
+              tickFormatter={(v: number) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
+            <YAxis yAxisId="right" orientation="right" tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} unit="%" />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend wrapperStyle={{ fontSize: 11, color: "#9ca3af" }} />
+            <Line yAxisId="left" type="monotone" dataKey="avgViews" name="Vues moy."
+              stroke="#FF1654" strokeWidth={2} dot={{ fill: "#FF1654", r: 4 }} activeDot={{ r: 6 }} />
+            <Line yAxisId="right" type="monotone" dataKey="avgEng" name="Engagement %"
+              stroke="#00D9FF" strokeWidth={2} dot={{ fill: "#00D9FF", r: 4 }} activeDot={{ r: 6 }} strokeDasharray="4 2" />
+          </LineChart>
         </ResponsiveContainer>
       </ChartCard>
 

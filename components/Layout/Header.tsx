@@ -86,11 +86,6 @@ export default function Header() {
 
                 <span className="max-w-[110px] truncate text-gray-700">{session.user?.email}</span>
 
-                {/* Plan icon next to name */}
-                {icon && (
-                  <Image src={icon} alt={planName} width={20} height={20} className="object-contain rounded shrink-0" />
-                )}
-
                 <span className="text-gray-400 text-xs">{dropdownOpen ? "▲" : "▼"}</span>
               </button>
 

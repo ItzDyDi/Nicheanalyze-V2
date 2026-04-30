@@ -97,18 +97,22 @@ function TestimonialCard({ t }: { t: T }) {
   return (
     <div
       className="rounded-2xl p-6 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-1"
-      style={{ background: "rgba(255,255,255,0.035)", border: "1px solid rgba(255,255,255,0.08)" }}
+      style={{
+        background: "#ffffff",
+        border: "1px solid #e5e7eb",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)",
+      }}
     >
       <StarDisplay value={t.stars} size={16} />
-      <p className="text-gray-300 text-sm leading-relaxed flex-1">"{t.quote}"</p>
-      <div className="flex items-center gap-2.5 pt-2 border-t border-white/5">
+      <p className="text-sm leading-relaxed flex-1" style={{ color: "#4b5563" }}>"{t.quote}"</p>
+      <div className="flex items-center gap-2.5 pt-2" style={{ borderTop: "1px solid #f3f4f6" }}>
         <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0"
-          style={{ background: "rgba(255,22,84,0.15)" }}>
+          style={{ background: "rgba(255,22,84,0.10)" }}>
           {t.niche.split(" ")[0]}
         </div>
         <div className="min-w-0">
-          <p className="text-white font-semibold text-xs truncate">{t.name}</p>
-          <p className="text-gray-500 text-xs truncate">{t.niche}{t.followers ? ` · ${t.followers}` : ""}</p>
+          <p className="font-semibold text-xs truncate" style={{ color: "#111827" }}>{t.name}</p>
+          <p className="text-xs truncate" style={{ color: "#9ca3af" }}>{t.niche}{t.followers ? ` · ${t.followers}` : ""}</p>
         </div>
       </div>
     </div>
@@ -225,13 +229,13 @@ export default function SocialProof() {
   const all = [...STATIC, ...userTestimonials];
 
   return (
-    <section className="py-24 px-6" style={{ background: "#0A0E27" }}>
+    <section className="py-24 px-6" style={{ background: "#f9fafb" }}>
       {showModal && <AddModal onClose={() => setShowModal(false)} onAdded={fetchTestimonials} />}
 
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-14">
           <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#FF1654" }}>Témoignages</p>
-          <h2 className="text-3xl font-black text-white">Ce que disent nos créateurs</h2>
+          <h2 className="text-3xl font-black" style={{ color: "#111827" }}>Ce que disent nos créateurs</h2>
         </div>
 
         {/* 4 cols on large: 3 testimonials + "+" on same row */}
@@ -242,7 +246,7 @@ export default function SocialProof() {
           <button
             onClick={() => setShowModal(true)}
             className="rounded-2xl p-6 flex flex-col items-center justify-center gap-3 transition-all duration-300 hover:-translate-y-1 group min-h-[180px]"
-            style={{ background: "rgba(255,22,84,0.03)", border: "1px dashed rgba(255,255,255,0.12)" }}
+            style={{ background: "rgba(255,22,84,0.02)", border: "1px dashed #e5e7eb" }}
           >
             <div
               className="w-11 h-11 rounded-full flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110"
@@ -250,10 +254,10 @@ export default function SocialProof() {
             >
               +
             </div>
-            <p className="text-gray-400 text-sm font-medium group-hover:text-white transition-colors">
+            <p className="text-sm font-medium transition-colors" style={{ color: "#6b7280" }}>
               Partager mon expérience
             </p>
-            <p className="text-gray-600 text-xs text-center leading-relaxed">
+            <p className="text-xs text-center leading-relaxed" style={{ color: "#9ca3af" }}>
               Tu utilises NicheAnalyze ?<br />Dis-le aux autres créateurs !
             </p>
           </button>

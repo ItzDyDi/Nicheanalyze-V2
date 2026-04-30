@@ -33,13 +33,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: { signIn: "/auth/login" },
   callbacks: {
     async jwt({ token, user, trigger, session: updateData }) {
-      // ── Nouveau login : on initialise tout depuis l'objet user
+      // ── Nouveau login : initialise depuis l'objet user
+      // Note: NextAuth v5 strips custom properties from `user` before this callback,
+      // so we set planSyncedAt=0 to force an immediate DB re-sync below.
       if (user) {
         token.id          = user.id;
         token.image       = (user as { image?: string }).image ?? null;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        token.plan        = (user as any).plan ?? "free";
-        token.planSyncedAt = Date.now();
+        token.plan        = "free";   // sera écrasé par la re-sync DB ci-dessous
+        token.planSyncedAt = 0;       // force re-sync immédiat
       }
 
       // ── update() appelé côté client (ex: changement avatar/nom)
@@ -75,12 +76,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     async session({ session, token }) {
-      if (session.user) {
-        (session.user as { id?: string }).id               = token.id as string;
-        (session.user as { image?: string | null }).image  = token.image as string | null;
-        (session.user as { plan?: string }).plan           = (token.plan as string) ?? "free";
-      }
-      return session;
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id:    token.id    as string,
+          image: token.image as string | null,
+          plan:  (token.plan as string) ?? "free",
+          name:  (token.name as string) ?? session.user?.name ?? null,
+        },
+      };
     },
   },
 });

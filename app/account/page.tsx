@@ -33,6 +33,14 @@ export default function AccountPage() {
   const userImage = (session.user as { image?: string | null }).image;
   const userEmail = session.user?.email ?? "";
   const initial = userEmail[0]?.toUpperCase() ?? "U";
+  const plan = (session.user as { plan?: string }).plan ?? "free";
+
+  const PLAN_META: Record<string, { label: string; color: string; icon: string | null; searches: string; videos: string; export: string }> = {
+    free:    { label: "Free",    color: "#94a3b8", icon: null,                searches: "5",           videos: "10 max", export: "Non inclus" },
+    pro:     { label: "Pro",     color: "#FF1654", icon: "/icone-pro.png",     searches: "50",          videos: "50 max", export: "✓ Inclus"  },
+    premium: { label: "Premium", color: "#00D9FF", icon: "/icone-premium.png", searches: "Illimitées",  videos: "100+",   export: "✓ Inclus"  },
+  };
+  const meta = PLAN_META[plan] ?? PLAN_META.free;
 
   async function saveName() {
     if (!nameValue.trim()) return;
@@ -145,6 +153,9 @@ export default function AccountPage() {
               ) : (
                 <div className="flex items-center gap-2">
                   <p className="text-white font-semibold">{session.user?.name ?? "Utilisateur"}</p>
+                  {meta.icon && (
+                    <Image src={meta.icon} alt={meta.label} width={18} height={18} className="object-contain rounded shrink-0" />
+                  )}
                   <button
                     onClick={() => { setNameValue(session.user?.name ?? ""); setEditingName(true); setNameError(""); }}
                     className="text-xs text-gray-500 hover:text-[#FF1654] transition-colors"
@@ -175,21 +186,24 @@ export default function AccountPage() {
               <span className="text-gray-400">Email</span>
               <span className="text-white">{userEmail}</span>
             </div>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-sm items-center">
               <span className="text-gray-400">Plan actuel</span>
-              <span className="font-bold" style={{ color: "#94a3b8" }}>Free</span>
+              <div className="flex items-center gap-1.5">
+                {meta.icon && <Image src={meta.icon} alt={meta.label} width={16} height={16} className="object-contain rounded" />}
+                <span className="font-bold" style={{ color: meta.color }}>{meta.label}</span>
+              </div>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-400">Recherches / jour</span>
-              <span className="text-white">5</span>
+              <span className="text-white">{meta.searches}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-400">Vidéos / recherche</span>
-              <span className="text-white">10 max</span>
+              <span className="text-white">{meta.videos}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-400">Export</span>
-              <span className="text-gray-500">Non inclus</span>
+              <span style={{ color: plan !== "free" ? "#10b981" : "#6b7280" }}>{meta.export}</span>
             </div>
           </div>
         </div>
@@ -211,17 +225,28 @@ export default function AccountPage() {
             <span className="text-gray-300 group-hover:text-white text-sm">💳 Abonnement & facturation</span>
             <span className="text-gray-500 text-xs">→</span>
           </Link>
-          <Link
-            href="/pricing"
-            className="flex items-center justify-between p-3 rounded-xl transition-colors group"
-            style={{ background: "rgba(255,22,84,0.06)", border: "1px solid rgba(255,22,84,0.2)" }}
-          >
-            <div>
-              <span className="text-sm font-bold" style={{ color: "#FF1654" }}>⭐ Upgrade vers Pro — 4,99€/mois</span>
-              <p className="text-gray-500 text-xs mt-0.5">50 recherches/jour · 50 vidéos · Export CSV</p>
-            </div>
-            <span className="text-gray-500 text-xs">→</span>
-          </Link>
+          {plan !== "premium" && (
+            <Link
+              href="/pricing"
+              className="flex items-center justify-between p-3 rounded-xl transition-colors group"
+              style={{ background: "rgba(255,22,84,0.06)", border: "1px solid rgba(255,22,84,0.2)" }}
+            >
+              <div>
+                {plan === "pro" ? (
+                  <>
+                    <span className="text-sm font-bold" style={{ color: "#00D9FF" }}>💎 Upgrade vers Premium — 14,99€/mois</span>
+                    <p className="text-gray-500 text-xs mt-0.5">Recherches illimitées · 100+ vidéos · Analytics avancés</p>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-sm font-bold" style={{ color: "#FF1654" }}>⭐ Upgrade vers Pro — 4,99€/mois</span>
+                    <p className="text-gray-500 text-xs mt-0.5">50 recherches/jour · 50 vidéos · Export CSV</p>
+                  </>
+                )}
+              </div>
+              <span className="text-gray-500 text-xs">→</span>
+            </Link>
+          )}
         </div>
 
         {/* Logout */}
