@@ -71,7 +71,7 @@ export default function PricingPage() {
                 <div className="mb-5">
                   {key !== "free" && (
                     <Image
-                      src={key === "pro" ? "/icone-pro.jpg" : "/icone-premium.jpg"}
+                      src={key === "pro" ? "/icone-pro.png" : "/icone-premium.png"}
                       alt={plan.label}
                       width={48} height={48}
                       className="rounded-xl mb-3 object-contain"
