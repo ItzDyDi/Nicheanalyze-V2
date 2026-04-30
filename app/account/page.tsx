@@ -163,8 +163,10 @@ export default function AccountPage() {
               ) : (
                 <div className="flex items-center gap-2">
                   <p className="text-white font-semibold">{session.user?.name ?? "Utilisateur"}</p>
-                  {meta.icon && (
-                    <Image src={meta.icon} alt={meta.label} width={18} height={18} className="object-contain rounded shrink-0" />
+                  {plan !== "free" && (
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ color: meta.color, background: `${meta.color}18` }}>
+                      {meta.label}
+                    </span>
                   )}
                   <button
                     onClick={() => { setNameValue(session.user?.name ?? ""); setEditingName(true); setNameError(""); }}
