@@ -405,11 +405,14 @@ export default function SearchPage() {
                 </button>
               )}
 
-              <div className="flex justify-center mt-8">
-                <button className="bg-white border border-gray-200 rounded-full w-9 h-9 flex items-center justify-center text-gray-400 hover:bg-gray-50 shadow-sm">
-                  ↓
+              {expanded && (
+                <button
+                  onClick={() => { setExpanded(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                  className="w-full mt-4 py-3 bg-white border border-gray-200 rounded-2xl text-gray-400 text-sm hover:bg-gray-50 transition shadow-sm flex items-center justify-center gap-2"
+                >
+                  <span>↑</span> Réduire
                 </button>
-              </div>
+              )}
             </div>
 
             {/* Right: stats panel (40%) */}

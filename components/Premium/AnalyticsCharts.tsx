@@ -2,6 +2,7 @@
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ScatterChart, Scatter, Cell, Legend, LineChart, Line,
+  AreaChart, Area,
 } from "recharts";
 import type { ChartData } from "@/lib/premium-analytics";
 
@@ -101,20 +102,26 @@ export default function AnalyticsCharts({ data }: { data: ChartData }) {
         </ResponsiveContainer>
       </ChartCard>
 
-      {/* Chart 4: Distribution des vues */}
+      {/* Chart 4: Distribution des vues — area chart */}
       <ChartCard title="Distribution des vues" subtitle="Répartition des vidéos par tranche de vues">
         <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={data.viewsDistribution} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+          <AreaChart data={data.viewsDistribution} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
+            <defs>
+              <linearGradient id="viewsGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="#a78bfa" stopOpacity={0.02} />
+              </linearGradient>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis dataKey="range" tick={{ fill: "#9ca3af", fontSize: 10 }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="count" name="Nb vidéos" radius={[6, 6, 0, 0]} maxBarSize={48}>
-              {data.viewsDistribution.map((_, i) => (
-                <Cell key={i} fill={COLORS[i % COLORS.length]} />
-              ))}
-            </Bar>
-          </BarChart>
+            <Area type="monotone" dataKey="count" name="Nb vidéos"
+              stroke="#a78bfa" strokeWidth={2.5}
+              fill="url(#viewsGrad)"
+              dot={{ fill: "#a78bfa", r: 4, strokeWidth: 0 }}
+              activeDot={{ r: 6, fill: "#a78bfa" }} />
+          </AreaChart>
         </ResponsiveContainer>
       </ChartCard>
 

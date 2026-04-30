@@ -56,7 +56,7 @@ export default function PredictionCard({ videos }: { videos: ScrapedVideo[] }) {
     const hourCount: Record<number, number> = {};
     hours.forEach(h => { hourCount[h] = (hourCount[h] ?? 0) + 1; });
     const peakHour = parseInt(Object.entries(hourCount).sort((a, b) => b[1] - a[1])[0][0]);
-    bestTimeMsg = `${peakHour}h - ${(peakHour + 2) % 24}h (heure des top performers)`;
+    bestTimeMsg = `${peakHour}h - ${(peakHour + 2) % 24}h UTC (top performers)`;
   }
 
   const viralColor = avgVirality >= 8 ? "#10b981" : avgVirality >= 5 ? "#f59e0b" : "#FF1654";
@@ -89,7 +89,7 @@ export default function PredictionCard({ videos }: { videos: ScrapedVideo[] }) {
         <div className="rounded-xl p-3" style={{ background: "rgba(0,217,255,0.07)", border: "1px solid rgba(0,217,255,0.15)" }}>
           <p className="text-[10px] text-gray-500 mb-1">Meilleure heure pour poster</p>
           <p className="text-sm font-black text-white leading-tight">{bestTimeMsg}</p>
-          <p className="text-[10px] text-gray-600 mt-0.5">Heure locale des créateurs</p>
+          <p className="text-[10px] text-gray-600 mt-0.5">Basé sur les horodatages TikTok (UTC)</p>
         </div>
       </div>
 
