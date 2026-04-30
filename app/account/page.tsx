@@ -11,6 +11,10 @@ export default function AccountPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [editingName, setEditingName] = useState(false);
+  const [nameValue, setNameValue] = useState("");
+  const [nameSaving, setNameSaving] = useState(false);
+  const [nameError, setNameError] = useState("");
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/auth/login");
@@ -29,6 +33,21 @@ export default function AccountPage() {
   const userImage = (session.user as { image?: string | null }).image;
   const userEmail = session.user?.email ?? "";
   const initial = userEmail[0]?.toUpperCase() ?? "U";
+
+  async function saveName() {
+    if (!nameValue.trim()) return;
+    setNameSaving(true);
+    setNameError("");
+    const res = await fetch("/api/user/name", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: nameValue.trim() }),
+    });
+    const data = await res.json();
+    if (!res.ok) { setNameError(data.error ?? "Erreur"); }
+    else { await update({ name: data.name }); setEditingName(false); }
+    setNameSaving(false);
+  }
 
   async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -106,8 +125,36 @@ export default function AccountPage() {
               />
             </div>
 
-            <div>
-              <p className="text-white font-semibold">{session.user?.name ?? "Utilisateur"}</p>
+            <div className="flex-1 min-w-0">
+              {editingName ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    autoFocus
+                    value={nameValue}
+                    onChange={(e) => setNameValue(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") saveName(); if (e.key === "Escape") setEditingName(false); }}
+                    maxLength={50}
+                    className="bg-gray-700 text-white text-sm font-semibold px-2 py-1 rounded-lg border border-gray-600 focus:outline-none focus:border-[#FF1654] w-40"
+                  />
+                  <button onClick={saveName} disabled={nameSaving}
+                    className="text-xs text-emerald-400 hover:text-emerald-300 font-bold">
+                    {nameSaving ? "..." : "✓"}
+                  </button>
+                  <button onClick={() => setEditingName(false)} className="text-xs text-gray-500 hover:text-gray-300">✕</button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <p className="text-white font-semibold">{session.user?.name ?? "Utilisateur"}</p>
+                  <button
+                    onClick={() => { setNameValue(session.user?.name ?? ""); setEditingName(true); setNameError(""); }}
+                    className="text-xs text-gray-500 hover:text-[#FF1654] transition-colors"
+                    title="Modifier le nom"
+                  >
+                    ✎
+                  </button>
+                </div>
+              )}
+              {nameError && <p className="text-red-400 text-xs mt-0.5">{nameError}</p>}
               <p className="text-gray-400 text-sm">{userEmail}</p>
               <button
                 onClick={() => fileInputRef.current?.click()}

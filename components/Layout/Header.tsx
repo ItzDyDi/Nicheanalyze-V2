@@ -6,12 +6,18 @@ import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 
 const NAV_LINKS = [
-  { href: "/",                  label: "Home" },
-  { href: "/dashboard/search",  label: "Recherche" },
-  { href: "/blog",              label: "Blog" },
-  { href: "/pricing",           label: "Pricing" },
-  { href: "/docs",              label: "Docs" },
+  { href: "/",                 label: "Home" },
+  { href: "/dashboard/search", label: "Recherche" },
+  { href: "/blog",             label: "Blog" },
+  { href: "/pricing",          label: "Pricing" },
+  { href: "/docs",             label: "Docs" },
 ];
+
+function planIcon(plan: string) {
+  if (plan === "premium") return "/icone-premium.png";
+  if (plan === "pro")     return "/icone-pro.png";
+  return null;
+}
 
 export default function Header() {
   const pathname = usePathname();
@@ -30,6 +36,10 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const plan     = (session?.user as { plan?: string })?.plan ?? "free";
+  const icon     = planIcon(plan);
+  const planName = plan === "premium" ? "Premium" : plan === "pro" ? "Pro" : "Free";
+
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -42,15 +52,12 @@ export default function Header() {
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1">
           {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
+            <Link key={link.href} href={link.href}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 pathname === link.href
                   ? "text-[#FF1654] bg-red-50"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              }`}
-            >
+              }`}>
               {link.label}
             </Link>
           ))}
@@ -62,45 +69,60 @@ export default function Header() {
             <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
           ) : session ? (
             <div className="relative hidden md:block" ref={dropdownRef}>
+              {/* Trigger button */}
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors text-sm text-gray-800"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors text-sm"
               >
+                {/* Avatar */}
                 <div className="w-7 h-7 rounded-full overflow-hidden bg-[#FF1654]/10 flex items-center justify-center text-xs font-bold text-[#FF1654] shrink-0">
                   {(session.user as { image?: string | null }).image ? (
-                    <Image
-                      src={(session.user as { image?: string }).image!}
-                      alt="Avatar"
-                      width={28} height={28}
-                      className="object-cover w-full h-full"
-                      unoptimized
-                    />
+                    <Image src={(session.user as { image?: string }).image!} alt="Avatar"
+                      width={28} height={28} className="object-cover w-full h-full" unoptimized />
                   ) : (
                     session.user?.email?.[0]?.toUpperCase() ?? "U"
                   )}
                 </div>
-                <span className="max-w-[120px] truncate text-gray-700">{session.user?.email}</span>
+
+                <span className="max-w-[110px] truncate text-gray-700">{session.user?.email}</span>
+
+                {/* Plan icon next to name */}
+                {icon && (
+                  <Image src={icon} alt={planName} width={20} height={20} className="object-contain rounded shrink-0" />
+                )}
+
                 <span className="text-gray-400 text-xs">{dropdownOpen ? "▲" : "▼"}</span>
               </button>
 
+              {/* Dropdown */}
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-50">
+                <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-50">
                   <div className="px-4 py-2.5 border-b border-gray-100">
-                    <p className="text-gray-900 text-sm font-medium truncate">{session.user?.name ?? "Utilisateur"}</p>
+                    <p className="text-gray-900 text-sm font-medium truncate">
+                      {session.user?.name ?? "Utilisateur"}
+                    </p>
                     <p className="text-gray-500 text-xs truncate">{session.user?.email}</p>
-                    <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-500">
-                      Plan Free · 5 recherches/jour
-                    </span>
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      {icon && <Image src={icon} alt={planName} width={16} height={16} className="object-contain rounded" />}
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-500">
+                        Plan {planName}
+                      </span>
+                    </div>
                   </div>
+
                   <Link href="/account" onClick={() => setDropdownOpen(false)}
                     className="block px-4 py-2.5 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors">
                     Mon profil
                   </Link>
-                  <Link href="/pricing" onClick={() => setDropdownOpen(false)}
-                    className="block px-4 py-2.5 text-sm font-semibold hover:bg-gray-50 transition-colors"
-                    style={{ color: "#FF1654" }}>
-                    ⭐ Upgrade vers Pro
-                  </Link>
+
+                  {plan === "free" && (
+                    <Link href="/pricing" onClick={() => setDropdownOpen(false)}
+                      className="block px-4 py-2.5 text-sm font-semibold hover:bg-gray-50 transition-colors"
+                      style={{ color: "#FF1654" }}>
+                      ⭐ Upgrade vers Pro
+                    </Link>
+                  )}
+
                   <div className="border-t border-gray-100 mt-1">
                     <button
                       onClick={() => { setDropdownOpen(false); signOut({ callbackUrl: "/" }); }}
@@ -113,20 +135,16 @@ export default function Header() {
               )}
             </div>
           ) : (
-            <Link
-              href="/auth/login"
-              className="hidden md:inline-flex items-center px-4 py-2 bg-[#FF1654] text-white text-sm font-semibold rounded-lg hover:bg-[#e0123f] transition-colors"
-            >
+            <Link href="/auth/login"
+              className="hidden md:inline-flex items-center px-4 py-2 bg-[#FF1654] text-white text-sm font-semibold rounded-lg hover:bg-[#e0123f] transition-colors">
               Se connecter
             </Link>
           )}
 
           {/* Burger */}
-          <button
-            onClick={() => setOpen(!open)}
+          <button onClick={() => setOpen(!open)}
             className="md:hidden text-gray-600 hover:text-gray-900 p-2 text-xl leading-none"
-            aria-label="Menu"
-          >
+            aria-label="Menu">
             {open ? "✕" : "☰"}
           </button>
         </div>
@@ -136,16 +154,12 @@ export default function Header() {
       {open && (
         <div className="md:hidden border-t border-gray-200 bg-white px-4 py-3 space-y-1">
           {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setOpen(false)}
+            <Link key={link.href} href={link.href} onClick={() => setOpen(false)}
               className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 pathname === link.href
                   ? "text-[#FF1654] bg-red-50"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              }`}
-            >
+              }`}>
               {link.label}
             </Link>
           ))}
@@ -157,8 +171,7 @@ export default function Header() {
               </Link>
               <button
                 onClick={() => { setOpen(false); signOut({ callbackUrl: "/" }); }}
-                className="block w-full text-left mt-2 px-4 py-2.5 border border-red-200 text-red-500 rounded-lg text-sm hover:bg-red-50 transition-colors"
-              >
+                className="block w-full text-left mt-2 px-4 py-2.5 border border-red-200 text-red-500 rounded-lg text-sm hover:bg-red-50 transition-colors">
                 Déconnexion
               </button>
             </>
