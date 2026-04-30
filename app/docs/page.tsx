@@ -1,5 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { FEATURE_ROWS, PLANS } from "@/lib/plan-limits";
+
+export const metadata: Metadata = {
+  title: "Documentation — Guide d'utilisation",
+  description:
+    "Tout ce qu'il faut savoir pour utiliser NicheAnalyze : recherches, statistiques, export CSV, analytics premium, limites par plan et FAQ complète.",
+  alternates: { canonical: "https://nicheanalyze.vercel.app/docs" },
+  openGraph: {
+    url: "https://nicheanalyze.vercel.app/docs",
+    title: "Documentation NicheAnalyze — Guide d'utilisation",
+    description:
+      "Guide complet pour utiliser NicheAnalyze : recherches TikTok, statistiques, export CSV et analytics premium.",
+  },
+};
 
 const PLAN_KEYS = ["free", "pro", "premium"] as const;
 

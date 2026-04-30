@@ -12,9 +12,41 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
+const BASE = "https://nicheanalyze.vercel.app";
+
 export const metadata: Metadata = {
-  title: "NicheAnalyze — Analyse TikTok pour créateurs",
-  description: "Découvrez quels types de vidéos performent vraiment sur TikTok.",
+  metadataBase: new URL(BASE),
+  title: {
+    default: "NicheAnalyze — Analyse TikTok pour créateurs",
+    template: "%s | NicheAnalyze",
+  },
+  description:
+    "Analysez n'importe quelle niche TikTok en quelques secondes. Hooks, formats, durées — tout ce qu'il faut pour créer du contenu qui cartonne.",
+  keywords: [
+    "analyse TikTok", "niche TikTok", "créateur TikTok", "viralité TikTok",
+    "hashtags TikTok", "outils TikTok", "statistiques TikTok", "NicheAnalyze",
+  ],
+  authors: [{ name: "NicheAnalyze", url: BASE }],
+  creator: "NicheAnalyze",
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    url: BASE,
+    siteName: "NicheAnalyze",
+    title: "NicheAnalyze — Analyse TikTok pour créateurs",
+    description:
+      "Analysez n'importe quelle niche TikTok en quelques secondes. Hooks, formats, durées — tout ce qu'il faut pour créer du contenu qui cartonne.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "NicheAnalyze" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "NicheAnalyze — Analyse TikTok pour créateurs",
+    description:
+      "Analysez n'importe quelle niche TikTok en quelques secondes. Hooks, formats, durées — tout ce qu'il faut pour créer du contenu qui cartonne.",
+    images: ["/og-image.png"],
+  },
+  robots: { index: true, follow: true },
+  alternates: { canonical: BASE },
 };
 
 export default function RootLayout({

@@ -1,5 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { blogPosts } from "@/lib/blog-posts";
+
+export const metadata: Metadata = {
+  title: "Blog — Guides & Stratégies TikTok",
+  description:
+    "Guides, stratégies et analyses pour créateurs TikTok. Hooks viraux, formats gagnants, hashtags performants — tout ce qu'il faut pour cartonner sur TikTok.",
+  alternates: { canonical: "https://nicheanalyze.vercel.app/blog" },
+  openGraph: {
+    url: "https://nicheanalyze.vercel.app/blog",
+    title: "Blog NicheAnalyze — Guides & Stratégies TikTok",
+    description:
+      "Hooks viraux, formats gagnants, hashtags performants — les meilleures stratégies TikTok pour créateurs.",
+  },
+};
 
 const CATEGORY_COLORS: Record<string, string> = {
   Hooks: "text-rose-400",

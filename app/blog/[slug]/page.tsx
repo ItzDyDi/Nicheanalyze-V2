@@ -1,9 +1,40 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getPostBySlug, getRelatedPosts, blogPosts, type Block } from "@/lib/blog-posts";
 
+const BASE = "https://nicheanalyze.vercel.app";
+
 export async function generateStaticParams() {
   return blogPosts.map((p) => ({ slug: p.slug }));
+}
+
+export async function generateMetadata(
+  { params }: { params: { slug: string } }
+): Promise<Metadata> {
+  const post = getPostBySlug(params.slug);
+  if (!post) return {};
+  const url = `${BASE}/blog/${post.slug}`;
+  return {
+    title: post.title,
+    description: post.excerpt,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      url,
+      title: post.title,
+      description: post.excerpt,
+      publishedTime: post.date,
+      tags: [post.category, post.niche, "TikTok"],
+      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: post.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: ["/og-image.png"],
+    },
+  };
 }
 
 function renderBlock(block: Block, i: number) {
@@ -101,7 +132,30 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
   const prev = currentIndex > 0 ? blogPosts[currentIndex - 1] : null;
   const next = currentIndex < blogPosts.length - 1 ? blogPosts[currentIndex + 1] : null;
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.excerpt,
+    datePublished: post.date,
+    dateModified: post.date,
+    author: { "@type": "Organization", name: "NicheAnalyze", url: BASE },
+    publisher: {
+      "@type": "Organization",
+      name: "NicheAnalyze",
+      url: BASE,
+      logo: { "@type": "ImageObject", url: `${BASE}/logo.png` },
+    },
+    url: `${BASE}/blog/${post.slug}`,
+    mainEntityOfPage: { "@type": "WebPage", "@id": `${BASE}/blog/${post.slug}` },
+  };
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
     <div style={{ background: "#0A0E27", minHeight: "100vh" }}>
 
       {/* Hero */}
@@ -213,5 +267,6 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -1,7 +1,22 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { PLANS, FEATURE_ROWS } from "@/lib/plan-limits";
 import CheckoutButton from "@/components/Pricing/CheckoutButton";
+import { auth } from "@/auth";
+
+export const metadata: Metadata = {
+  title: "Tarifs — Free, Pro & Premium",
+  description:
+    "Choisissez le plan adapté à votre activité. Gratuit pour toujours, Pro à 4,99€/mois ou Premium à 14,99€/mois. Analyses TikTok illimitées, export CSV, analytics avancées.",
+  alternates: { canonical: "https://nicheanalyze.vercel.app/pricing" },
+  openGraph: {
+    url: "https://nicheanalyze.vercel.app/pricing",
+    title: "Tarifs NicheAnalyze — Free, Pro & Premium",
+    description:
+      "Gratuit pour toujours, Pro à 4,99€/mois ou Premium à 14,99€/mois. Analyses TikTok, export CSV, analytics avancées.",
+  },
+};
 
 const PLAN_KEYS = ["free", "pro", "premium"] as const;
 
@@ -36,7 +51,10 @@ const SORTED_ROWS = [...FEATURE_ROWS].sort((a, b) => {
   return score(b) - score(a);
 });
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const session = await auth();
+  const userPlan = (session?.user as { plan?: string })?.plan ?? null;
+
   return (
     <div style={{ minHeight: "100vh", background: "#0A0E27" }}>
 
@@ -95,13 +113,22 @@ export default function PricingPage() {
 
                 {/* CTA */}
                 {key === "free" ? (
-                  <Link
-                    href="/dashboard/search"
-                    className={`block w-full text-center py-2.5 rounded-xl text-sm font-bold transition-all mb-6 hover:brightness-110 ${style.btn}`}
-                    style={btnBg ? { background: btnBg } : {}}
-                  >
-                    Commencer gratuitement
-                  </Link>
+                  userPlan === "free" ? (
+                    <div
+                      className="block w-full text-center py-2.5 rounded-xl text-sm font-bold mb-6 cursor-default"
+                      style={{ background: "rgba(255,255,255,0.08)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)" }}
+                    >
+                      ✓ Votre abonnement actuel
+                    </div>
+                  ) : (
+                    <Link
+                      href="/dashboard/search"
+                      className={`block w-full text-center py-2.5 rounded-xl text-sm font-bold transition-all mb-6 hover:brightness-110 ${style.btn}`}
+                      style={btnBg ? { background: btnBg } : {}}
+                    >
+                      Commencer gratuitement
+                    </Link>
+                  )
                 ) : (
                   <CheckoutButton
                     plan={key as "pro" | "premium"}
@@ -143,7 +170,7 @@ export default function PricingPage() {
               ))}
             </div>
             {/* Rows */}
-            {FEATURE_ROWS.map((row, i) => (
+            {SORTED_ROWS.map((row, i) => (
               <div key={row.label}
                 className="grid grid-cols-4 text-center text-xs py-3.5 px-4"
                 style={{
