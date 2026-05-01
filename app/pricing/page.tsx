@@ -74,7 +74,7 @@ export default async function PricingPage() {
 
       {/* Hero */}
       <div className="py-20 px-6 text-center" style={{ background: "linear-gradient(180deg, #0C1030 0%, #0A0E27 100%)" }}>
-        <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#FF1654" }}>Pricing</p>
+        <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#FF1654" }}>Prix</p>
         <h1 className="text-4xl font-black text-white mb-3">Un plan pour chaque créateur</h1>
         <p className="text-gray-400">Commence gratuitement. Upgrade quand tu es prêt.</p>
       </div>

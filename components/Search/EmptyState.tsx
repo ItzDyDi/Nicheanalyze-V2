@@ -128,7 +128,7 @@ export default function EmptyState({ lastSearch, onSearch }: Props) {
       <div className="flex justify-center gap-3">
         {[
           { href: "/blog", label: "📖 Blog" },
-          { href: "/pricing", label: "💎 Pricing" },
+          { href: "/pricing", label: "💎 Prix" },
           { href: "/docs", label: "📚 Docs" },
         ].map((l) => (
           <Link

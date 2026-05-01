@@ -6,7 +6,7 @@ const LINKS = {
     { label: "Recherche", href: "/dashboard/search" },
     { label: "Blog", href: "/blog" },
     { label: "Docs", href: "/docs" },
-    { label: "Pricing", href: "/pricing" },
+    { label: "Prix", href: "/pricing" },
   ],
   Légal: [
     { label: "Confidentialité", href: "#" },
