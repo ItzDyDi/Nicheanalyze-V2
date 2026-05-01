@@ -3,6 +3,13 @@ import Credentials from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
+// Never put base64 data URLs in the JWT — store the API endpoint path instead
+function safeImageUrl(image: string | null | undefined): string | null {
+  if (!image) return null;
+  if (image.startsWith("data:")) return "/api/user/avatar";
+  return image;
+}
+
 const PLAN_SYNC_INTERVAL = 5 * 60 * 1000; // re-fetch plan depuis la DB toutes les 5 min
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -25,7 +32,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!isValid) return null;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return { id: user.id, email: user.email, name: user.name ?? undefined, image: user.image ?? undefined, plan: (user as any).plan ?? "free" };
+        return { id: user.id, email: user.email, name: user.name ?? undefined, image: safeImageUrl(user.image) ?? undefined, plan: (user as any).plan ?? "free" };
       },
     }),
   ],
@@ -45,7 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       // ── update() appelé côté client (ex: changement avatar/nom)
       if (trigger === "update") {
-        if (updateData?.image !== undefined) token.image = updateData.image;
+        if (updateData?.image !== undefined) token.image = safeImageUrl(updateData.image);
         if (updateData?.name  !== undefined) token.name  = updateData.name;
         // Forcer une resync du plan si demandé explicitement
         if (updateData?.forcePlanSync) token.planSyncedAt = 0;
@@ -64,7 +71,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             token.plan        = (dbUser as any).plan ?? "free";
             token.name        = dbUser.name ?? token.name;
-            token.image       = dbUser.image ?? token.image;
+            token.image       = safeImageUrl(dbUser.image) ?? token.image;
             token.planSyncedAt = Date.now();
           }
         } catch {
