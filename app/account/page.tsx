@@ -183,7 +183,7 @@ export default function AccountPage() {
               // eslint-disable-next-line @next/next/no-img-element
               <img src={meta.icon} alt={meta.label}
                 className="rounded-2xl shrink-0 ml-auto"
-                style={{ width: 80, height: 80, objectFit: "fill", display: "block" }} />
+                style={{ width: 120, height: 120, objectFit: "fill", display: "block" }} />
             )}
 
           </div>
