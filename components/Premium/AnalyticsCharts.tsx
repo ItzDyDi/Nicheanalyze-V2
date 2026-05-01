@@ -8,6 +8,12 @@ import type { ChartData } from "@/lib/premium-analytics";
 
 const COLORS = ["#FF1654", "#00D9FF", "#a78bfa", "#f59e0b", "#10b981", "#f97316"];
 
+function fmtVal(v: number): string {
+  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;
+  if (v >= 1_000) return `${(v / 1_000).toFixed(0)}k`;
+  return v.toString();
+}
+
 function ChartCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
     <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
@@ -26,7 +32,7 @@ function CustomTooltip({ active, payload, label }: any) {
     <div className="rounded-xl px-3 py-2 text-xs" style={{ background: "#1e2235", border: "1px solid rgba(255,255,255,0.12)" }}>
       <p className="text-gray-300 font-semibold mb-1">{label}</p>
       {payload.map((p: { name: string; value: number; color: string }) => (
-        <p key={p.name} style={{ color: p.color }}>{p.name}: <span className="text-white font-bold">{p.value}</span></p>
+        <p key={p.name} style={{ color: p.color }}>{p.name}: <span className="text-white font-bold">{fmtVal(p.value)}</span></p>
       ))}
     </div>
   );
