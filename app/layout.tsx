@@ -36,14 +36,14 @@ export const metadata: Metadata = {
     title: "NicheAnalyze — Analyse TikTok pour créateurs",
     description:
       "Analysez n'importe quelle niche TikTok en quelques secondes. Hooks, formats, durées — tout ce qu'il faut pour créer du contenu qui cartonne.",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "NicheAnalyze" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "NicheAnalyze — Analyse TikTok pour créateurs" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "NicheAnalyze — Analyse TikTok pour créateurs",
     description:
       "Analysez n'importe quelle niche TikTok en quelques secondes. Hooks, formats, durées — tout ce qu'il faut pour créer du contenu qui cartonne.",
-    images: ["/og-image.png"],
+    images: ["/opengraph-image"],
   },
   robots: { index: true, follow: true },
   alternates: { canonical: BASE },

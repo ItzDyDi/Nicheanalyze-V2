@@ -1,0 +1,47 @@
+# NicheAnalyze — Outil d'analyse TikTok pour créateurs de contenu
+
+## À propos
+
+NicheAnalyze est un outil SaaS d'analyse TikTok qui permet aux créateurs de contenu et aux agences de découvrir les tendances de leur niche, d'analyser les vidéos les plus performantes, et d'optimiser leur stratégie de contenu.
+
+URL : https://nicheanalyze.vercel.app
+
+## Fonctionnalités principales
+
+- **Analyse de niche TikTok** : Recherchez n'importe quel mot-clé ou hashtag pour voir les vidéos qui cartonnent dans cette niche.
+- **Analytics de contenu** : Métriques complètes (vues, likes, taux d'engagement, durée, hooks).
+- **Hooks viraux** : Identification des phrases d'accroche qui génèrent le plus de vues.
+- **Top hashtags** : Classement des hashtags par fréquence et performance moyenne.
+- **Distribution des vues** : Histogramme adaptatif pour visualiser la dispersion des performances.
+- **Scorecard premium** : Classement des 3 meilleures vidéos avec analyse détaillée.
+- **Export CSV** : Téléchargement des données pour analyse externe.
+- **Filtrage par langue** : Résultats en français ou en anglais selon le besoin.
+
+## Plans tarifaires
+
+- **Free** : 5 recherches/jour, 10 vidéos par recherche, accès basique
+- **Pro** (4,99 €/mois) : 30 recherches/jour, 20 vidéos, export CSV, top hooks
+- **Premium** (14,99 €/mois) : Recherches illimitées, 50 vidéos, analytics avancées, scorecard, distribution des vues
+
+## Cas d'usage typiques
+
+- Un créateur TikTok qui veut analyser sa niche avant de créer du contenu
+- Une agence de marketing qui effectue une veille concurrentielle sur TikTok
+- Un entrepreneur qui cherche une niche peu saturée mais à fort engagement
+- Un éducateur ou coach qui veut comprendre les formats de contenu qui fonctionnent
+
+## Niches couvertes
+
+Animaux de compagnie, DIY & décoration, éducation & finance, fitness & sport, gaming, beauté & mode, cuisine & recettes, voyage, musique, humour & entertainment, et toute recherche personnalisée par mot-clé.
+
+## Langue
+
+L'interface est en français. Les recherches supportent le français et l'anglais avec filtrage automatique des résultats par langue.
+
+## Technologies
+
+Next.js, Prisma, PostgreSQL (Neon), API TikTok via RapidAPI, Recharts, NextAuth v5, déployé sur Vercel.
+
+## Contact
+
+Pour toute question : https://nicheanalyze.vercel.app/docs

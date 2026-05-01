@@ -51,12 +51,26 @@ const SORTED_ROWS = [...FEATURE_ROWS].sort((a, b) => {
   return score(b) - score(a);
 });
 
+const FAQ_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map(({ q, a }) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a },
+  })),
+};
+
 export default async function PricingPage() {
   const session = await auth();
   const userPlan = (session?.user as { plan?: string })?.plan ?? null;
 
   return (
     <div style={{ minHeight: "100vh", background: "#0A0E27" }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSONLD) }}
+      />
 
       {/* Hero */}
       <div className="py-20 px-6 text-center" style={{ background: "linear-gradient(180deg, #0C1030 0%, #0A0E27 100%)" }}>
