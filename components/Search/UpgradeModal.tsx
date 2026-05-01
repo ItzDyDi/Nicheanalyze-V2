@@ -123,24 +123,16 @@ export default function UpgradeModal({ plan, reason, onClose }: Props) {
           </ul>
         </div>
 
-        {/* CTAs */}
-        <div className="flex flex-col gap-2">
-          <Link
-            href={upgrade.href}
-            className="w-full py-3 rounded-xl text-center text-sm font-black text-white transition-opacity hover:opacity-90"
-            style={{ background: upgrade.color === "#FF1654"
-              ? "linear-gradient(135deg, #FF1654, #ff6b8a)"
-              : "linear-gradient(135deg, #00D9FF, #00b8d9)" }}
-          >
-            Upgrade vers {upgrade.label} →
-          </Link>
-          <button
-            onClick={onClose}
-            className="w-full py-2.5 rounded-xl text-center text-xs text-gray-500 hover:text-gray-300 transition-colors"
-          >
-            Continuer en {plan === "free" ? "Free" : "Pro"}
-          </button>
-        </div>
+        {/* CTA */}
+        <Link
+          href={upgrade.href}
+          className="w-full py-3 rounded-xl text-center text-sm font-black text-white transition-opacity hover:opacity-90 block"
+          style={{ background: upgrade.color === "#FF1654"
+            ? "linear-gradient(135deg, #FF1654, #ff6b8a)"
+            : "linear-gradient(135deg, #00D9FF, #00b8d9)" }}
+        >
+          Upgrade vers {upgrade.label} →
+        </Link>
       </div>
     </div>
   );

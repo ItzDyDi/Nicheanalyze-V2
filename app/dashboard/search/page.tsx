@@ -215,6 +215,7 @@ export default function SearchPage() {
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [upgradeModal, setUpgradeModal] = useState<"search_limit" | "video_limit" | "hashtag_limit" | "export" | "analytics" | null>(null);
+  const [limitHit, setLimitHit] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [lastSearch, setLastSearch] = useState<string>("");
   const [langOverride, setLangOverride] = useState<"fr" | "en" | null>(null);
@@ -252,6 +253,7 @@ export default function SearchPage() {
     setSearched(true);
     setExpanded(false);
     setError(null);
+    setLimitHit(false);
     localStorage.setItem("nicheanalyze_last_search", kw);
     setLastSearch(kw);
     try {
@@ -263,6 +265,7 @@ export default function SearchPage() {
           setShowLoginPrompt(true);
         } else if (res.status === 429 && msg.toLowerCase().includes("limite")) {
           setUpgradeModal("search_limit");
+          setLimitHit(true);
         } else {
           setError(msg);
         }
@@ -403,11 +406,28 @@ export default function SearchPage() {
         )}
 
         {!loading && searched && !error && results.length === 0 && (
-          <div className="text-center py-16 text-gray-400">
-            <p className="text-4xl mb-3">🔍</p>
-            <p className="font-medium text-gray-600 mb-1">Aucun résultat trouvé</p>
-            <p className="text-sm">Essaie un autre mot-clé ou en anglais</p>
-          </div>
+          limitHit ? (
+            <div className="text-center py-16">
+              <p className="text-4xl mb-3">🚀</p>
+              <p className="font-semibold text-white mb-2">Tu as atteint ta limite du jour</p>
+              <p className="text-sm text-gray-400 max-w-xs mx-auto mb-5">
+                Passe à un plan supérieur pour continuer à analyser des niches sans interruption — plus de recherches, plus de vidéos, des analytics avancés.
+              </p>
+              <a
+                href="/pricing"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-black text-white transition-opacity hover:opacity-90"
+                style={{ background: "linear-gradient(135deg, #FF1654, #ff6b8a)" }}
+              >
+                Voir les plans →
+              </a>
+            </div>
+          ) : (
+            <div className="text-center py-16 text-gray-400">
+              <p className="text-4xl mb-3">🔍</p>
+              <p className="font-medium text-gray-600 mb-1">Aucun résultat trouvé</p>
+              <p className="text-sm">Essaie un autre mot-clé ou en anglais</p>
+            </div>
+          )
         )}
 
         {/* Results */}
