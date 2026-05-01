@@ -57,14 +57,7 @@ export default function EmptyState({ lastSearch, onSearch }: Props) {
 
       {/* Hero */}
       <div className="text-center mb-10">
-        <Image
-          src="/logo.png"
-          alt="NicheAnalyze"
-          width={64}
-          height={64}
-          className="mx-auto mb-4 object-contain"
-          unoptimized
-        />
+
         <h2 className="text-2xl font-bold text-gray-900 mb-2">{title}</h2>
         <p className="text-gray-500 text-sm">{subtitle}</p>
         {niche && (
