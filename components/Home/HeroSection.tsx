@@ -6,7 +6,7 @@ export default function HeroSection() {
     <section
       className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 sm:px-6"
       style={{
-        backgroundImage: "url('/image%20de%20fond%20page%20acceuil.jpg')",
+        backgroundImage: "url('/hero-bg.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
