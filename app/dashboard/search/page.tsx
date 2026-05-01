@@ -579,7 +579,7 @@ function PremiumSection({ videos }: { videos: ScrapedVideo[] }) {
           <p className="text-white font-bold text-sm mb-3">🏆 Scoring des 3 meilleures vidéos</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {top3.map((v, i) => (
-              <VideoScorecard key={v.id} score={analyzeVideoAdvanced(v)} hook={v.hook} rank={i + 1} />
+              <VideoScorecard key={v.id} score={analyzeVideoAdvanced(v)} hook={v.hook} rank={i + 1} thumbnail={v.thumbnail} videoUrl={v.videoUrl} />
             ))}
           </div>
         </div>

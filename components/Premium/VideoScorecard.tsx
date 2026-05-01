@@ -33,24 +33,45 @@ function ScoreItem({ icon, label, score, description }: { icon: string; label: s
   );
 }
 
-export default function VideoScorecard({ score, hook, rank }: { score: VideoScore; hook: string; rank: number }) {
+export default function VideoScorecard({ score, hook, rank, thumbnail, videoUrl }: {
+  score: VideoScore;
+  hook: string;
+  rank: number;
+  thumbnail?: string;
+  videoUrl?: string;
+}) {
   const viralColor = scoreColor(score.virality);
   return (
-    <div className="rounded-2xl p-5 space-y-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+    <div className="rounded-2xl overflow-hidden space-y-0" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+
+      {/* Thumbnail */}
+      {thumbnail && videoUrl ? (
+        <a href={videoUrl} target="_blank" rel="noopener noreferrer" className="block relative w-full aspect-video overflow-hidden group">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={thumbnail} alt={hook} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <span className="text-white text-2xl">▶</span>
+          </div>
+          <span className="absolute top-2 left-2 text-xs font-bold text-white bg-black/60 px-2 py-0.5 rounded-lg">#{rank}</span>
+        </a>
+      ) : (
+        <div className="w-full aspect-video bg-gray-800 flex items-center justify-center">
+          <span className="text-gray-600 text-xs">#{rank}</span>
+        </div>
+      )}
+
+      <div className="p-4 space-y-3">
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold text-gray-500">#{rank}</span>
-            <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: viralColor.bg, color: viralColor.text, border: `1px solid ${viralColor.border}` }}>
-              Viralité {score.virality}/10
-            </span>
-          </div>
-          <p className="text-xs text-gray-300 italic leading-snug line-clamp-2">"{hook}"</p>
+          <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: viralColor.bg, color: viralColor.text, border: `1px solid ${viralColor.border}` }}>
+            Viralité {score.virality}/10
+          </span>
+          <p className="text-xs text-gray-300 italic leading-snug line-clamp-2 mt-2">"{hook}"</p>
         </div>
         {/* Virality big score */}
-        <div className="shrink-0 w-14 h-14 rounded-2xl flex flex-col items-center justify-center" style={{ background: viralColor.bg, border: `1px solid ${viralColor.border}` }}>
-          <span className="text-xl font-black" style={{ color: viralColor.text }}>{score.virality}</span>
+        <div className="shrink-0 w-12 h-12 rounded-xl flex flex-col items-center justify-center" style={{ background: viralColor.bg, border: `1px solid ${viralColor.border}` }}>
+          <span className="text-lg font-black" style={{ color: viralColor.text }}>{score.virality}</span>
           <span className="text-[9px] text-gray-500 font-medium">/10</span>
         </div>
       </div>
@@ -61,6 +82,7 @@ export default function VideoScorecard({ score, hook, rank }: { score: VideoScor
         <ScoreItem icon="⏱️" label="Durée"   score={score.duration} description={score.durationLabel} />
         <ScoreItem icon="🎬" label="Format"  score={score.format}   description={score.formatLabel} />
         <ScoreItem icon="📣" label="CTA"     score={score.cta}      description={score.ctaLabel} />
+      </div>
       </div>
     </div>
   );
