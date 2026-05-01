@@ -24,7 +24,7 @@ const features = [
 
 export default function FeaturesGrid() {
   return (
-    <section className="py-24 px-6" style={{ background: "#ffffff" }}>
+    <section className="py-12 sm:py-24 px-4 sm:px-6" style={{ background: "#ffffff" }}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#f59e0b" }}>
@@ -38,11 +38,11 @@ export default function FeaturesGrid() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
           {features.map((f, i) => (
             <div
               key={i}
-              className="rounded-2xl p-8 group transition-all duration-300 hover:-translate-y-2"
+              className="rounded-2xl p-5 sm:p-8 group transition-all duration-300 hover:-translate-y-2"
               style={{
                 background: "#ffffff",
                 border: "1px solid #e5e7eb",

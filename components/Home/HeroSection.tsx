@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function HeroSection() {
   return (
     <section
-      className="relative min-h-screen flex items-center justify-center overflow-hidden px-6"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 sm:px-6"
       style={{ background: "#ffffff" }}
     >
       {/* Subtle tinted orbs */}
@@ -43,7 +43,7 @@ export default function HeroSection() {
         <h1
           className="font-black mb-6 leading-none"
           style={{
-            fontSize: "clamp(2.8rem, 7vw, 5.5rem)",
+            fontSize: "clamp(2rem, 7vw, 5.5rem)",
             color: "#111827",
             animation: "fade-in-up 0.7s ease-out 0.1s both",
           }}
@@ -62,7 +62,7 @@ export default function HeroSection() {
         {/* Subtitle */}
         <p
           className="mb-10 max-w-2xl mx-auto leading-relaxed"
-          style={{ fontSize: "1.125rem", color: "#6b7280", animation: "fade-in-up 0.7s ease-out 0.2s both" }}
+          style={{ fontSize: "clamp(0.95rem, 3vw, 1.125rem)", color: "#6b7280", animation: "fade-in-up 0.7s ease-out 0.2s both" }}
         >
           Analysez n'importe quelle niche en quelques secondes. Hooks, formats,
           durées — tout ce qu'il faut pour créer du contenu qui cartonne.
@@ -70,12 +70,12 @@ export default function HeroSection() {
 
         {/* CTAs */}
         <div
-          className="flex flex-col sm:flex-row gap-4 justify-center mb-14"
+          className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-10 sm:mb-14"
           style={{ animation: "fade-in-up 0.7s ease-out 0.3s both" }}
         >
           <Link
             href="/dashboard/search"
-            className="px-9 py-4 rounded-xl font-bold text-white text-base transition-all duration-200 hover:scale-105 hover:brightness-110"
+            className="px-6 sm:px-9 py-4 rounded-xl font-bold text-white text-base transition-all duration-200 hover:scale-105 hover:brightness-110"
             style={{
               background: "linear-gradient(135deg, #FF1654, #d4103c)",
               boxShadow: "0 4px 20px rgba(255,22,84,0.35)",
@@ -94,7 +94,7 @@ export default function HeroSection() {
 
         {/* Stats */}
         <div
-          className="flex flex-wrap justify-center gap-8 text-sm"
+          className="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm"
           style={{ animation: "fade-in-up 0.7s ease-out 0.4s both" }}
         >
           {[

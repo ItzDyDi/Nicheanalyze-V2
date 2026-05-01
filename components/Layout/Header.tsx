@@ -42,11 +42,11 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between">
 
         {/* Logo */}
         <Link href="/" className="flex items-center shrink-0">
-          <Image src="/logo.png" alt="NicheAnalyze" width={160} height={40} className="object-contain" priority />
+          <Image src="/logo.png" alt="NicheAnalyze" width={130} height={34} className="object-contain sm:w-[160px] sm:h-[40px]" priority />
         </Link>
 
         {/* Desktop nav */}
@@ -91,7 +91,7 @@ export default function Header() {
 
               {/* Dropdown */}
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-50">
+                <div className="absolute right-0 mt-2 w-[calc(100vw-1rem)] sm:w-56 max-w-[224px] bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-50">
                   <div className="px-4 py-2.5 border-b border-gray-100">
                     <p className="text-gray-900 text-sm font-medium truncate">
                       {session.user?.name ?? "Utilisateur"}

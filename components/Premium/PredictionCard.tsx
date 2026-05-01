@@ -80,7 +80,7 @@ export default function PredictionCard({ videos }: { videos: ScrapedVideo[] }) {
       <div className="border-t border-white/5" />
 
       {/* Predicted views */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="rounded-xl p-3" style={{ background: "rgba(255,22,84,0.07)", border: "1px solid rgba(255,22,84,0.15)" }}>
           <p className="text-[10px] text-gray-500 mb-1">Vues estimées (si bien exécuté)</p>
           <p className="text-base font-black text-white">{fmt(low)} – {fmt(high)}</p>
