@@ -92,19 +92,14 @@ export default function AccountPage() {
         <div className="bg-gray-800 rounded-2xl border border-gray-700 p-6 space-y-4 relative">
 
           {/* Plan badge — absolute top right of card */}
-          {plan !== "free" && (
-            <div className="absolute top-5 right-5 flex flex-col items-center gap-1 px-4 py-3 rounded-2xl"
+          {plan !== "free" && meta.icon && (
+            <div className="absolute top-5 right-5 w-16 h-16 rounded-2xl overflow-hidden"
               style={{
                 background: plan === "premium" ? "rgba(0,217,255,0.15)" : "rgba(255,22,84,0.15)",
                 border: `2px solid ${meta.color}70`,
               }}>
-              {meta.icon && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={meta.icon} alt={meta.label} width={36} height={36} className="object-contain" />
-              )}
-              <span className="text-[11px] font-black tracking-widest" style={{ color: meta.color }}>
-                {meta.label.toUpperCase()}
-              </span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={meta.icon} alt={meta.label} className="w-full h-full object-cover" />
             </div>
           )}
 
