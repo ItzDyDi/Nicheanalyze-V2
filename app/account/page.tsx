@@ -91,22 +91,7 @@ export default function AccountPage() {
         {/* Profile card */}
         <div className="bg-gray-800 rounded-2xl border border-gray-700 p-6 space-y-4 relative">
 
-          {/* Plan badge — absolute top right of card */}
-          {plan !== "free" && meta.icon && (
-            <div
-              className="absolute top-6 right-6 rounded-2xl overflow-hidden"
-              style={{ width: 96, height: 96, border: `2px solid ${meta.color}80` }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={meta.icon}
-                alt={meta.label}
-                style={{ width: 96, height: 96, objectFit: "fill", display: "block" }}
-              />
-            </div>
-          )}
-
-          <div className="flex items-start gap-4 pr-32">
+          <div className="flex items-center gap-4">
             {/* Avatar with upload */}
             <div className="relative group">
               <button
@@ -192,6 +177,16 @@ export default function AccountPage() {
                 {uploading ? "Upload en cours..." : "Changer la photo"}
               </button>
             </div>
+
+            {/* Plan icon — inline in row, no overflow */}
+            {plan !== "free" && meta.icon && (
+              <div className="rounded-2xl overflow-hidden shrink-0 ml-auto"
+                style={{ width: 72, height: 72, border: `2px solid ${meta.color}80` }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={meta.icon} alt={meta.label}
+                  style={{ width: 72, height: 72, objectFit: "fill", display: "block" }} />
+              </div>
+            )}
 
           </div>
 
