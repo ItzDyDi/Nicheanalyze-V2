@@ -27,6 +27,9 @@ export interface ChartData {
   contentTypes: { type: string; count: number; avgViews: number; avgEng: number }[];
   hookVsEngagement: { hookScore: number; engagement: number; views: number; label: string }[];
   viewsDistribution: { range: string; count: number; avgEngagement: number }[];
+  engagementFunnel: { name: string; total: number; rate: number; color: string }[];
+  postingDays: { day: string; avgViews: number; count: number }[];
+  viewsTimeline: { label: string; ts: number; views: number; likes: number }[];
 }
 
 export interface Benchmark {
@@ -350,7 +353,50 @@ export function computeChartData(videos: ScrapedVideo[]): ChartData {
     return { range: b.range, count: g.length, avgEngagement: g.length > 0 ? parseFloat((g.reduce((s, v) => s + v.engagementRate, 0) / g.length).toFixed(2)) : 0 };
   }).filter(b => b.count > 0);
 
-  return { durationPerformance, contentTypes, hookVsEngagement, viewsDistribution };
+  // Engagement funnel
+  const totalViews    = videos.reduce((s, v) => s + v.views, 0);
+  const totalLikes    = videos.reduce((s, v) => s + v.likes, 0);
+  const totalComments = videos.reduce((s, v) => s + v.comments, 0);
+  const engagementFunnel = [
+    { name: "Vues",       total: totalViews,    rate: 100,   color: "#00D9FF" },
+    { name: "Likes",      total: totalLikes,    rate: totalViews > 0 ? parseFloat((totalLikes    / totalViews * 100).toFixed(2)) : 0, color: "#FF1654" },
+    { name: "Commentaires", total: totalComments, rate: totalViews > 0 ? parseFloat((totalComments / totalViews * 100).toFixed(2)) : 0, color: "#a78bfa" },
+  ];
+
+  // Meilleurs jours pour poster (UTC depuis publishedAt)
+  const DAYS_FR = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+  const dayMap: Record<number, number[]> = {};
+  videos.filter(v => v.publishedAt > 0).forEach(v => {
+    const dow = new Date(v.publishedAt * 1000).getDay();
+    (dayMap[dow] ??= []).push(v.views);
+  });
+  const postingDays = DAYS_FR.map((day, i) => ({
+    day,
+    avgViews: dayMap[i] ? Math.round(dayMap[i].reduce((a, b) => a + b, 0) / dayMap[i].length) : 0,
+    count: dayMap[i]?.length ?? 0,
+  }));
+
+  // Timeline — vues et likes par semaine de publication
+  const weekMap: Record<string, { ts: number; views: number[]; likes: number[] }> = {};
+  videos.filter(v => v.publishedAt > 0).forEach(v => {
+    const d = new Date(v.publishedAt * 1000);
+    const mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    const ts = mon.getTime();
+    const label = mon.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+    if (!weekMap[label]) weekMap[label] = { ts, views: [], likes: [] };
+    weekMap[label].views.push(v.views);
+    weekMap[label].likes.push(v.likes);
+  });
+  const viewsTimeline = Object.entries(weekMap)
+    .map(([label, d]) => ({
+      label,
+      ts: d.ts,
+      views: Math.round(d.views.reduce((a, b) => a + b, 0) / d.views.length),
+      likes: Math.round(d.likes.reduce((a, b) => a + b, 0) / d.likes.length),
+    }))
+    .sort((a, b) => a.ts - b.ts);
+
+  return { durationPerformance, contentTypes, hookVsEngagement, viewsDistribution, engagementFunnel, postingDays, viewsTimeline };
 }
 
 export function getBenchmark(videos: ScrapedVideo[]): Benchmark {

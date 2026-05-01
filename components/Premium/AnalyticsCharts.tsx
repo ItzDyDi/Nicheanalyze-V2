@@ -2,7 +2,7 @@
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ScatterChart, Scatter, Cell, Legend, LineChart, Line,
-  AreaChart, Area,
+  AreaChart, Area, PieChart, Pie,
 } from "recharts";
 import type { ChartData } from "@/lib/premium-analytics";
 
@@ -34,6 +34,7 @@ function CustomTooltip({ active, payload, label }: any) {
 
 export default function AnalyticsCharts({ data }: { data: ChartData }) {
   return (
+    <div className="space-y-4">
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
       {/* Chart 1: Duration performance */}
@@ -144,6 +145,100 @@ export default function AnalyticsCharts({ data }: { data: ChartData }) {
         </ResponsiveContainer>
       </ChartCard>
 
+    </div>
+
+    {/* ── Section 2 : Dashboard style Coupler ── */}
+    <div className="space-y-4 mt-4">
+
+      {/* Engagement funnel — 3 anneaux */}
+      <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+        <p className="text-white font-bold text-sm mb-1">Funnel d'engagement</p>
+        <p className="text-gray-500 text-xs mb-4">Vues totales → taux de like → taux de commentaire</p>
+        <div className="flex flex-col sm:flex-row items-center justify-around gap-4">
+          {data.engagementFunnel.map((item, i) => {
+            const fmtTotal = (n: number) => n >= 1_000_000 ? `${(n/1_000_000).toFixed(1)}M` : n >= 1000 ? `${(n/1000).toFixed(1)}k` : String(n);
+            const pieData = i === 0
+              ? [{ value: 100 }, { value: 0 }]
+              : [{ value: item.rate }, { value: Math.max(0, 100 - item.rate) }];
+            return (
+              <div key={item.name} className="flex flex-col items-center gap-1">
+                <div className="relative w-28 h-28">
+                  <PieChart width={112} height={112}>
+                    <Pie data={pieData} cx={52} cy={52} innerRadius={36} outerRadius={52}
+                      startAngle={90} endAngle={-270} dataKey="value" strokeWidth={0}>
+                      <Cell fill={item.color} />
+                      <Cell fill="rgba(255,255,255,0.06)" />
+                    </Pie>
+                  </PieChart>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-xs font-black text-white">{fmtTotal(item.total)}</span>
+                    {i > 0 && <span className="text-[10px] font-bold" style={{ color: item.color }}>{item.rate}%</span>}
+                  </div>
+                </div>
+                <p className="text-xs text-gray-400 font-medium">{item.name}</p>
+                {i > 0 && <p className="text-[10px] text-gray-600">taux / vues</p>}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Meilleurs jours + Timeline côte à côte */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        {/* Meilleurs jours pour poster */}
+        <ChartCard title="Meilleurs jours pour poster" subtitle="Vues moyennes des vidéos selon le jour de publication (UTC)">
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={data.postingDays} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+              <XAxis dataKey="day" tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false}
+                tickFormatter={(v: number) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar dataKey="avgViews" name="Vues moy." radius={[6, 6, 0, 0]} maxBarSize={40}>
+                {data.postingDays.map((d, i) => {
+                  const max = Math.max(...data.postingDays.map(x => x.avgViews));
+                  return <Cell key={i} fill={d.avgViews === max ? "#00D9FF" : "rgba(0,217,255,0.3)"} />;
+                })}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        {/* Timeline vues + likes */}
+        {data.viewsTimeline.length >= 2 ? (
+          <ChartCard title="Timeline des publications" subtitle="Vues et likes moyens par semaine">
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={data.viewsTimeline} margin={{ top: 4, right: 10, left: -10, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="timelineGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#FF1654" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#FF1654" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                <XAxis dataKey="label" tick={{ fill: "#9ca3af", fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false}
+                  tickFormatter={(v: number) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend wrapperStyle={{ fontSize: 11, color: "#9ca3af" }} />
+                <Line type="monotone" dataKey="views" name="Vues moy."
+                  stroke="#FF1654" strokeWidth={2.5} dot={{ fill: "#FF1654", r: 4, strokeWidth: 0 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="likes" name="Likes moy."
+                  stroke="#00D9FF" strokeWidth={2} dot={{ fill: "#00D9FF", r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} strokeDasharray="4 2" />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartCard>
+        ) : (
+          <ChartCard title="Timeline des publications" subtitle="Vues et likes moyens par semaine">
+            <div className="h-[200px] flex items-center justify-center">
+              <p className="text-gray-600 text-xs text-center">Données insuffisantes<br/>(les vidéos doivent avoir des dates de publication variées)</p>
+            </div>
+          </ChartCard>
+        )}
+
+      </div>
+    </div>
     </div>
   );
 }
