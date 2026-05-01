@@ -6,34 +6,47 @@ import { checkRateLimit, checkDailyRateLimit, getClientIp, rateLimitResponse } f
 
 export async function GET(request: Request) {
   const session = await auth();
-  if (!session?.user) {
-    return Response.json({ success: false, error: "Connexion requise" }, { status: 401 });
+  const ip = getClientIp(request);
+  const isGuest = !session?.user;
+
+  // Guests : 2 recherches par IP par jour, pas de compte requis
+  if (isGuest) {
+    const guestCheck = checkDailyRateLimit(`guest-search:${ip}`, 2);
+    if (!guestCheck.allowed) {
+      return Response.json(
+        { success: false, error: "guest_limit", guestLimit: true },
+        { status: 429 },
+      );
+    }
   }
 
-  const userId = (session.user as { id: string }).id;
-  const plan = ((session.user as { plan?: string }).plan ?? "free") as "free" | "pro" | "premium";
+  const userId = isGuest ? null : (session!.user as { id: string }).id;
+  const plan = isGuest
+    ? "free"
+    : (((session!.user as { plan?: string }).plan ?? "free") as "free" | "pro" | "premium");
   const planConfig = PLANS[plan];
 
-  // Rate limit : pas plus d'1 recherche / 3 secondes par utilisateur (anti-spam)
-  const burstCheck = checkRateLimit(`search-burst:${userId}`, 1, 3_000);
-  if (!burstCheck.allowed) {
-    return rateLimitResponse(burstCheck.resetAt, "Une recherche à la fois. Attends quelques secondes.");
+  if (!isGuest && userId) {
+    // Rate limit burst : pas plus d'1 recherche / 3 secondes
+    const burstCheck = checkRateLimit(`search-burst:${userId}`, 1, 3_000);
+    if (!burstCheck.allowed) {
+      return rateLimitResponse(burstCheck.resetAt, "Une recherche à la fois. Attends quelques secondes.");
+    }
+
+    // Rate limit journalière selon le plan, reset à minuit UTC
+    const dailyLimit = plan === "free" ? 5 : plan === "pro" ? 50 : 500;
+    const dailyCheck = checkDailyRateLimit(`search-daily:${userId}`, dailyLimit);
+    if (!dailyCheck.allowed) {
+      return rateLimitResponse(
+        dailyCheck.resetAt,
+        plan === "free"
+          ? "Limite de 5 recherches/jour atteinte. Upgrade vers Pro pour plus."
+          : "Limite journalière atteinte.",
+      );
+    }
   }
 
-  // Rate limit : limite journalière selon le plan, reset à minuit UTC
-  const dailyLimit = plan === "free" ? 5 : plan === "pro" ? 50 : 500;
-  const dailyCheck = checkDailyRateLimit(`search-daily:${userId}`, dailyLimit);
-  if (!dailyCheck.allowed) {
-    return rateLimitResponse(
-      dailyCheck.resetAt,
-      plan === "free"
-        ? "Limite de 5 recherches/jour atteinte. Upgrade vers Pro pour plus."
-        : "Limite journalière atteinte.",
-    );
-  }
-
-  // Rate limit IP : protection supplémentaire contre les comptes multiples
-  const ip = getClientIp(request);
+  // Rate limit IP : protection contre les comptes multiples
   const ipCheck = checkRateLimit(`search-ip:${ip}`, 100, 60 * 60 * 1000);
   if (!ipCheck.allowed) {
     return rateLimitResponse(ipCheck.resetAt, "Trop de recherches depuis cette adresse.");
@@ -94,6 +107,7 @@ export async function GET(request: Request) {
       detectedLanguage,
       total: sorted.length,
       premiumLocked: plan !== "premium",
+      isGuest,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Erreur inconnue";

@@ -7,6 +7,7 @@ import { translateQuery } from "@/lib/language-keywords";
 import StatsOverview from "@/components/Search/StatsOverview";
 import EmptyState from "@/components/Search/EmptyState";
 import UpgradeModal from "@/components/Search/UpgradeModal";
+import LoginPromptModal from "@/components/Search/LoginPromptModal";
 import Tooltip from "@/components/Tooltip";
 import { TOOLTIPS } from "@/lib/tooltip-data";
 import { analyzeVideo } from "@/lib/video-analyzer";
@@ -36,6 +37,8 @@ interface SearchResponse {
   detectedLanguage?: "fr" | "en" | "other";
   total: number;
   premiumLocked?: boolean;
+  guestLimit?: boolean;
+  isGuest?: boolean;
   error?: string;
 }
 
@@ -212,6 +215,7 @@ export default function SearchPage() {
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [upgradeModal, setUpgradeModal] = useState<"search_limit" | "video_limit" | "hashtag_limit" | "export" | "analytics" | null>(null);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [lastSearch, setLastSearch] = useState<string>("");
   const [langOverride, setLangOverride] = useState<"fr" | "en" | null>(null);
 
@@ -230,6 +234,15 @@ export default function SearchPage() {
     const kw = q ?? keyword;
     if (!kw.trim()) return;
     if (q) setKeyword(q);
+
+    // Guest : bloquer après 2 recherches côté client
+    if (!session?.user) {
+      const guestCount = parseInt(localStorage.getItem("nicheanalyze_guest_searches") || "0");
+      if (guestCount >= 2) {
+        setShowLoginPrompt(true);
+        return;
+      }
+    }
     const searchLang = lang ?? effectiveLang;
     // Si la langue forcée est différente de celle détectée, on traduit la requête
     const autoLang = detectLanguage(kw);
@@ -246,7 +259,9 @@ export default function SearchPage() {
       const data: SearchResponse = await res.json();
       if (!data.success) {
         const msg = data.error ?? "Erreur lors de la recherche";
-        if (res.status === 429 && msg.toLowerCase().includes("limite")) {
+        if (data.guestLimit) {
+          setShowLoginPrompt(true);
+        } else if (res.status === 429 && msg.toLowerCase().includes("limite")) {
           setUpgradeModal("search_limit");
         } else {
           setError(msg);
@@ -258,6 +273,11 @@ export default function SearchPage() {
         setResults(data.videos ?? []);
         setPremiumVideos(data.premiumVideos ?? []);
         setStats(data.stats ?? null);
+        // Incrémenter le compteur guest après une recherche réussie
+        if (!session?.user) {
+          const guestCount = parseInt(localStorage.getItem("nicheanalyze_guest_searches") || "0");
+          localStorage.setItem("nicheanalyze_guest_searches", String(guestCount + 1));
+        }
       }
     } catch {
       setError("Erreur réseau — vérifie ta connexion");
@@ -283,6 +303,9 @@ export default function SearchPage() {
           reason={upgradeModal}
           onClose={() => setUpgradeModal(null)}
         />
+      )}
+      {showLoginPrompt && (
+        <LoginPromptModal onClose={() => setShowLoginPrompt(false)} />
       )}
       <div className="max-w-5xl mx-auto">
 
