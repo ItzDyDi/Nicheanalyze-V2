@@ -5,21 +5,28 @@ export default function HeroSection() {
   return (
     <section
       className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 sm:px-6"
-      style={{ background: "#ffffff" }}
+      style={{
+        backgroundImage: "url('/image%20de%20fond%20page%20acceuil.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
     >
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/50" />
+
       {/* Subtle tinted orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div style={{
           position: "absolute", top: "8%", left: "10%",
           width: 500, height: 500, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(255,22,84,0.06) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(255,22,84,0.12) 0%, transparent 70%)",
           filter: "blur(60px)",
           animation: "orb-float 9s ease-in-out infinite",
         }} />
         <div style={{
           position: "absolute", top: "40%", right: "8%",
           width: 380, height: 380, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(0,150,255,0.05) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(0,150,255,0.10) 0%, transparent 70%)",
           filter: "blur(60px)",
           animation: "orb-float-alt 12s ease-in-out infinite",
         }} />
@@ -44,7 +51,7 @@ export default function HeroSection() {
           className="font-black mb-6 leading-none"
           style={{
             fontSize: "clamp(2rem, 7vw, 5.5rem)",
-            color: "#111827",
+            color: "#ffffff",
             animation: "fade-in-up 0.7s ease-out 0.1s both",
           }}
         >
@@ -62,7 +69,7 @@ export default function HeroSection() {
         {/* Subtitle */}
         <p
           className="mb-10 max-w-2xl mx-auto leading-relaxed"
-          style={{ fontSize: "clamp(0.95rem, 3vw, 1.125rem)", color: "#6b7280", animation: "fade-in-up 0.7s ease-out 0.2s both" }}
+          style={{ fontSize: "clamp(0.95rem, 3vw, 1.125rem)", color: "#d1d5db", animation: "fade-in-up 0.7s ease-out 0.2s both" }}
         >
           Analysez n'importe quelle niche en quelques secondes. Hooks, formats,
           durées — tout ce qu'il faut pour créer du contenu qui cartonne.
@@ -85,8 +92,8 @@ export default function HeroSection() {
           </Link>
           <Link
             href="/blog"
-            className="px-9 py-4 rounded-xl font-semibold text-base transition-all duration-200 hover:bg-gray-100"
-            style={{ border: "1px solid #e5e7eb", color: "#374151" }}
+            className="px-9 py-4 rounded-xl font-semibold text-base transition-all duration-200 hover:bg-white/10"
+            style={{ border: "1px solid rgba(255,255,255,0.3)", color: "#ffffff" }}
           >
             Voir le blog
           </Link>
@@ -102,9 +109,9 @@ export default function HeroSection() {
             ["⭐", "4.9/5", "satisfaction créateurs"],
             ["🚀", "Gratuit", "pour commencer"],
           ].map(([icon, bold, label]) => (
-            <div key={label} className="flex items-center gap-1.5" style={{ color: "#9ca3af" }}>
+            <div key={label} className="flex items-center gap-1.5" style={{ color: "#d1d5db" }}>
               <span>{icon}</span>
-              <span className="font-semibold" style={{ color: "#111827" }}>{bold}</span>
+              <span className="font-semibold" style={{ color: "#ffffff" }}>{bold}</span>
               <span>{label}</span>
             </div>
           ))}
@@ -113,7 +120,7 @@ export default function HeroSection() {
 
       {/* Bottom fade to next section */}
       <div className="absolute bottom-0 left-0 right-0 h-28 pointer-events-none"
-        style={{ background: "linear-gradient(to bottom, transparent, #f9fafb)" }} />
+        style={{ background: "linear-gradient(to bottom, transparent, #0A0E27)" }} />
     </section>
   );
 }
