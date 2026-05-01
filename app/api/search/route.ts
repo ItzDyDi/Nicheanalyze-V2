@@ -89,9 +89,11 @@ export async function GET(request: Request) {
       success: true,
       data,
       videos: sorted,
+      premiumVideos: plan === "premium" ? sorted : [],
       stats: stats ? { ...stats, topHashtags, topHooks } : null,
       detectedLanguage,
       total: sorted.length,
+      premiumLocked: plan !== "premium",
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Erreur inconnue";

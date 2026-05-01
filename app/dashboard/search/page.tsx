@@ -30,9 +30,11 @@ interface ApiStats extends VideoStats {
 interface SearchResponse {
   success: boolean;
   videos: ScrapedVideo[];
+  premiumVideos?: ScrapedVideo[];
   stats: ApiStats | null;
   detectedLanguage?: "fr" | "en" | "other";
   total: number;
+  premiumLocked?: boolean;
   error?: string;
 }
 
@@ -202,6 +204,7 @@ export default function SearchPage() {
   const [keyword, setKeyword] = useState("");
   const [sortBy, setSortBy] = useState("views");
   const [results, setResults] = useState<ScrapedVideo[]>([]);
+  const [premiumVideos, setPremiumVideos] = useState<ScrapedVideo[]>([]);
   const [stats, setStats] = useState<ApiStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -242,9 +245,11 @@ export default function SearchPage() {
       if (!data.success) {
         setError(data.error ?? "Erreur lors de la recherche");
         setResults([]);
+        setPremiumVideos([]);
         setStats(null);
       } else {
         setResults(data.videos ?? []);
+        setPremiumVideos(data.premiumVideos ?? []);
         setStats(data.stats ?? null);
       }
     } catch {
@@ -427,7 +432,7 @@ export default function SearchPage() {
 
           {/* ── Premium Analytics Section ── */}
           {isPremium ? (
-            <PremiumSection videos={results} />
+            <PremiumSection videos={premiumVideos} />
           ) : (
             <div className="relative rounded-2xl overflow-hidden" style={{ background: "#0d1117" }}>
               {/* Blurred preview — fake charts */}
