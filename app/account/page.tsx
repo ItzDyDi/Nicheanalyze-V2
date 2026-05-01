@@ -178,14 +178,12 @@ export default function AccountPage() {
               </button>
             </div>
 
-            {/* Plan icon — inline in row, no overflow */}
+            {/* Plan icon — inline in row, no border */}
             {plan !== "free" && meta.icon && (
-              <div className="rounded-2xl overflow-hidden shrink-0 ml-auto"
-                style={{ width: 72, height: 72, border: `2px solid ${meta.color}80` }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={meta.icon} alt={meta.label}
-                  style={{ width: 72, height: 72, objectFit: "fill", display: "block" }} />
-              </div>
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={meta.icon} alt={meta.label}
+                className="rounded-2xl shrink-0 ml-auto"
+                style={{ width: 80, height: 80, objectFit: "fill", display: "block" }} />
             )}
 
           </div>
