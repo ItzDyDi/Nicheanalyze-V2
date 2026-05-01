@@ -96,7 +96,7 @@ export default function AccountPage() {
             <div className="relative group">
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="relative w-16 h-16 rounded-full overflow-hidden focus:outline-none ring-2 ring-gray-600 ring-offset-2 ring-offset-gray-800"
+                className="relative w-16 h-16 rounded-full overflow-hidden focus:outline-none ring-2 ring-gray-500"
                 title="Changer la photo"
                 disabled={uploading}
               >
