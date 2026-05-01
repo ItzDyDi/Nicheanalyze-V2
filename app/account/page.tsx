@@ -94,14 +94,15 @@ export default function AccountPage() {
           {/* Plan badge — absolute top right of card */}
           {plan !== "free" && meta.icon && (
             <div
-              className="absolute top-6 right-5 rounded-2xl overflow-hidden"
-              style={{ width: 80, height: 80, border: `2px solid ${meta.color}70` }}
+              className="absolute top-5 right-5 rounded-2xl"
+              style={{ padding: 4, background: `${meta.color}18`, border: `2px solid ${meta.color}80` }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={meta.icon}
                 alt={meta.label}
-                style={{ width: 80, height: 80, objectFit: "fill", display: "block" }}
+                className="rounded-xl block"
+                style={{ width: 80, height: 80, objectFit: "fill" }}
               />
             </div>
           )}
