@@ -179,8 +179,11 @@ export default function AccountPage() {
 
             {/* Plan badge — far right, opposite the avatar */}
             {plan !== "free" && (
-              <div className="shrink-0 self-start flex items-center px-3 py-1.5 rounded-xl"
+              <div className="shrink-0 self-start flex items-center gap-2 px-3 py-2 rounded-xl"
                 style={{ background: plan === "premium" ? "rgba(0,217,255,0.12)" : "rgba(255,22,84,0.12)", border: `1px solid ${meta.color}40` }}>
+                {meta.icon && (
+                  <Image src={meta.icon} alt={meta.label} width={22} height={22} className="object-contain" unoptimized />
+                )}
                 <span className="text-xs font-black tracking-wide" style={{ color: meta.color }}>
                   {meta.label.toUpperCase()}
                 </span>
@@ -200,7 +203,7 @@ export default function AccountPage() {
             <div className="flex justify-between text-sm items-center">
               <span className="text-gray-400">Plan actuel</span>
               <div className="flex items-center gap-1.5">
-                {meta.icon && <Image src={meta.icon} alt={meta.label} width={16} height={16} className="object-contain rounded" />}
+                {meta.icon && <Image src={meta.icon} alt={meta.label} width={20} height={20} className="object-contain" unoptimized />}
                 <span className="font-bold" style={{ color: meta.color }}>{meta.label}</span>
               </div>
             </div>
