@@ -342,12 +342,40 @@ export function computeChartData(videos: ScrapedVideo[]): ChartData {
     label: v.hook.slice(0, 35) + (v.hook.length > 35 ? "…" : ""),
   }));
 
-  // Views distribution
-  const vBuckets = [
-    { range: "< 10k", min: 0, max: 10000 }, { range: "10k-50k", min: 10000, max: 50000 },
-    { range: "50k-100k", min: 50000, max: 100000 }, { range: "100k-500k", min: 100000, max: 500000 },
-    { range: "500k-1M", min: 500000, max: 1000000 }, { range: "1M+", min: 1000000, max: Infinity },
-  ];
+  // Views distribution — buckets adapt to actual data scale
+  const maxViews = Math.max(...videos.map(v => v.views), 0);
+  const vBuckets: { range: string; min: number; max: number }[] =
+    maxViews >= 10_000_000
+      ? [
+          { range: "< 1M",    min: 0,          max: 1_000_000  },
+          { range: "1M-5M",   min: 1_000_000,  max: 5_000_000  },
+          { range: "5M-10M",  min: 5_000_000,  max: 10_000_000 },
+          { range: "10M-50M", min: 10_000_000, max: 50_000_000 },
+          { range: "50M+",    min: 50_000_000, max: Infinity   },
+        ]
+      : maxViews >= 1_000_000
+      ? [
+          { range: "< 100k",   min: 0,         max: 100_000   },
+          { range: "100k-500k",min: 100_000,   max: 500_000   },
+          { range: "500k-1M",  min: 500_000,   max: 1_000_000 },
+          { range: "1M-5M",    min: 1_000_000, max: 5_000_000 },
+          { range: "5M+",      min: 5_000_000, max: Infinity  },
+        ]
+      : maxViews >= 100_000
+      ? [
+          { range: "< 10k",    min: 0,       max: 10_000  },
+          { range: "10k-50k",  min: 10_000,  max: 50_000  },
+          { range: "50k-100k", min: 50_000,  max: 100_000 },
+          { range: "100k-500k",min: 100_000, max: 500_000 },
+          { range: "500k+",    min: 500_000, max: Infinity },
+        ]
+      : [
+          { range: "< 1k",    min: 0,      max: 1_000  },
+          { range: "1k-5k",   min: 1_000,  max: 5_000  },
+          { range: "5k-10k",  min: 5_000,  max: 10_000 },
+          { range: "10k-50k", min: 10_000, max: 50_000 },
+          { range: "50k+",    min: 50_000, max: Infinity },
+        ];
   const viewsDistribution = vBuckets.map(b => {
     const g = videos.filter(v => v.views >= b.min && v.views < b.max);
     return { range: b.range, count: g.length, avgEngagement: g.length > 0 ? parseFloat((g.reduce((s, v) => s + v.engagementRate, 0) / g.length).toFixed(2)) : 0 };
