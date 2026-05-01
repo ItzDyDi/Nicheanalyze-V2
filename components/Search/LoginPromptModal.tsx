@@ -64,7 +64,7 @@ export default function LoginPromptModal({ onClose }: Props) {
 
         <div className="flex flex-col gap-2">
           <Link
-            href="/auth/register"
+            href="/auth/signup"
             className="w-full py-3 rounded-xl text-center text-sm font-black text-white"
             style={{ background: "linear-gradient(135deg, #FF1654, #ff6b8a)" }}
           >

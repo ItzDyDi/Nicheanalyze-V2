@@ -259,7 +259,7 @@ export default function SearchPage() {
       const data: SearchResponse = await res.json();
       if (!data.success) {
         const msg = data.error ?? "Erreur lors de la recherche";
-        if (data.guestLimit) {
+        if (data.guestLimit || data.error === "guest_limit") {
           setShowLoginPrompt(true);
         } else if (res.status === 429 && msg.toLowerCase().includes("limite")) {
           setUpgradeModal("search_limit");

@@ -9,8 +9,8 @@ const NAV_LINKS = [
   { href: "/",                 label: "Home" },
   { href: "/dashboard/search", label: "Recherche" },
   { href: "/blog",             label: "Blog" },
-  { href: "/pricing",          label: "Pricing" },
   { href: "/docs",             label: "Docs" },
+  { href: "/pricing",          label: "Prix" },
 ];
 
 function planIcon(plan: string) {
