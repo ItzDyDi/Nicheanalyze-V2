@@ -91,16 +91,6 @@ export default function AccountPage() {
         {/* Profile card */}
         <div className="bg-gray-800 rounded-2xl border border-gray-700 p-6 space-y-4">
           <div className="flex items-start gap-4">
-            {/* Plan badge — affiché à droite en flex, pas en absolute */}
-            {plan !== "free" && (
-              <div className="ml-auto shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
-                style={{ background: plan === "premium" ? "rgba(0,217,255,0.12)" : "rgba(255,22,84,0.12)", border: `1px solid ${meta.color}40` }}>
-                <span className="text-xs font-black tracking-wide" style={{ color: meta.color }}>
-                  {meta.label.toUpperCase()}
-                </span>
-              </div>
-            )}
-
             {/* Avatar with upload */}
             <div className="relative group">
               <button
@@ -186,6 +176,16 @@ export default function AccountPage() {
                 {uploading ? "Upload en cours..." : "Changer la photo"}
               </button>
             </div>
+
+            {/* Plan badge — far right, opposite the avatar */}
+            {plan !== "free" && (
+              <div className="shrink-0 self-start flex items-center px-3 py-1.5 rounded-xl"
+                style={{ background: plan === "premium" ? "rgba(0,217,255,0.12)" : "rgba(255,22,84,0.12)", border: `1px solid ${meta.color}40` }}>
+                <span className="text-xs font-black tracking-wide" style={{ color: meta.color }}>
+                  {meta.label.toUpperCase()}
+                </span>
+              </div>
+            )}
           </div>
 
           {uploadError && (
