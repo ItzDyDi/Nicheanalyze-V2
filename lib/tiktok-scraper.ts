@@ -139,7 +139,20 @@ export async function searchTikTok(
   const data = await res.json();
   const items: unknown[] = data?.item_list ?? [];
 
-  return items.slice(0, limit).map((item) => mapItem(item, niche));
+  const all = items.map((item) => mapItem(item, niche));
+
+  // Filter by language if explicitly requested (fr or en)
+  if (lang === "fr" || lang === "en") {
+    const filtered = all.filter((v) => {
+      const detected = detectLanguage(`${v.hook} ${v.hashtags.join(" ")}`);
+      return detected === lang || detected === "other";
+    });
+    // Fallback to unfiltered if too few results
+    const result = filtered.length >= 3 ? filtered : all;
+    return result.slice(0, limit);
+  }
+
+  return all.slice(0, limit);
 }
 
 export function calculateStats(videos: ScrapedVideo[]): VideoStats | null {
