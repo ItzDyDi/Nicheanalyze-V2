@@ -89,9 +89,9 @@ export default function AccountPage() {
         </div>
 
         {/* Profile card */}
-        <div className="bg-gray-800 rounded-2xl border border-gray-700 p-6 space-y-4 relative">
+        <div className="bg-gray-800 rounded-2xl border border-gray-700 p-6 relative">
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-start gap-4">
             {/* Avatar with upload */}
             <div className="relative group">
               <button
@@ -192,7 +192,7 @@ export default function AccountPage() {
             <p className="text-red-400 text-sm">{uploadError}</p>
           )}
 
-          <div className="border-t border-gray-700 pt-4 space-y-3">
+          <div className="border-t border-gray-700 pt-4 mt-4 space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-gray-400">Email</span>
               <span className="text-white">{userEmail}</span>
