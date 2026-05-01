@@ -93,10 +93,16 @@ export default function AccountPage() {
 
           {/* Plan badge — absolute top right of card */}
           {plan !== "free" && meta.icon && (
-            <div className="absolute top-5 right-5 w-16 h-16 rounded-full overflow-hidden"
-              style={{ border: `2px solid ${meta.color}70` }}>
+            <div
+              className="absolute top-5 right-5 rounded-full overflow-hidden"
+              style={{ width: 64, height: 64, border: `2px solid ${meta.color}70`, flexShrink: 0 }}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={meta.icon} alt={meta.label} className="w-full h-full object-cover" />
+              <img
+                src={meta.icon}
+                alt={meta.label}
+                style={{ width: 64, height: 64, objectFit: "fill", display: "block" }}
+              />
             </div>
           )}
 
