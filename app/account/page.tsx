@@ -96,7 +96,7 @@ export default function AccountPage() {
             <div className="relative group">
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="relative w-16 h-16 rounded-full overflow-hidden focus:outline-none"
+                className="relative w-16 h-16 rounded-full overflow-hidden focus:outline-none ring-2 ring-gray-600 ring-offset-2 ring-offset-gray-800"
                 title="Changer la photo"
                 disabled={uploading}
               >
@@ -183,7 +183,7 @@ export default function AccountPage() {
               // eslint-disable-next-line @next/next/no-img-element
               <img src={meta.icon} alt={meta.label}
                 className="rounded-2xl shrink-0 ml-auto"
-                style={{ width: 120, height: 120, objectFit: "fill", display: "block" }} />
+                style={{ width: 160, height: 160, objectFit: "fill", display: "block" }} />
             )}
 
           </div>
