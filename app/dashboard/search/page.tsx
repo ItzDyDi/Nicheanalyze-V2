@@ -6,6 +6,7 @@ import { detectLanguage } from "@/lib/language-detector";
 import { translateQuery } from "@/lib/language-keywords";
 import StatsOverview from "@/components/Search/StatsOverview";
 import EmptyState from "@/components/Search/EmptyState";
+import UpgradeModal from "@/components/Search/UpgradeModal";
 import Tooltip from "@/components/Tooltip";
 import { TOOLTIPS } from "@/lib/tooltip-data";
 import { analyzeVideo } from "@/lib/video-analyzer";
@@ -210,6 +211,7 @@ export default function SearchPage() {
   const [expanded, setExpanded] = useState(false);
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [upgradeModal, setUpgradeModal] = useState<"search_limit" | "video_limit" | "hashtag_limit" | "export" | "analytics" | null>(null);
   const [lastSearch, setLastSearch] = useState<string>("");
   const [langOverride, setLangOverride] = useState<"fr" | "en" | null>(null);
 
@@ -243,7 +245,12 @@ export default function SearchPage() {
       const res = await fetch(`/api/search?q=${encodeURIComponent(finalKw)}&lang=${searchLang}`);
       const data: SearchResponse = await res.json();
       if (!data.success) {
-        setError(data.error ?? "Erreur lors de la recherche");
+        const msg = data.error ?? "Erreur lors de la recherche";
+        if (res.status === 429 && msg.toLowerCase().includes("limite")) {
+          setUpgradeModal("search_limit");
+        } else {
+          setError(msg);
+        }
         setResults([]);
         setPremiumVideos([]);
         setStats(null);
@@ -270,6 +277,13 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen bg-stone-50 px-3 sm:px-6 py-6">
+      {upgradeModal && (
+        <UpgradeModal
+          plan={plan as "free" | "pro"}
+          reason={upgradeModal}
+          onClose={() => setUpgradeModal(null)}
+        />
+      )}
       <div className="max-w-5xl mx-auto">
 
         {/* Search bar */}

@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { PLANS } from "@/lib/plan-limits";
 import { searchTikTok, calculateStats, getTopHashtags, getTopHooks } from "@/lib/tiktok-scraper";
 import { detectLanguage } from "@/lib/language-detector";
-import { checkRateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
+import { checkRateLimit, checkDailyRateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -20,9 +20,9 @@ export async function GET(request: Request) {
     return rateLimitResponse(burstCheck.resetAt, "Une recherche à la fois. Attends quelques secondes.");
   }
 
-  // Rate limit : limite journalière selon le plan (en mémoire — approximatif)
+  // Rate limit : limite journalière selon le plan, reset à minuit UTC
   const dailyLimit = plan === "free" ? 5 : plan === "pro" ? 50 : 500;
-  const dailyCheck = checkRateLimit(`search-daily:${userId}`, dailyLimit, 24 * 60 * 60 * 1000);
+  const dailyCheck = checkDailyRateLimit(`search-daily:${userId}`, dailyLimit);
   if (!dailyCheck.allowed) {
     return rateLimitResponse(
       dailyCheck.resetAt,

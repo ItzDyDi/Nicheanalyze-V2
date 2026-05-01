@@ -37,6 +37,35 @@ export function checkRateLimit(
   return { allowed: true, remaining: limit - entry.count, resetAt: entry.resetAt };
 }
 
+/** Next UTC midnight timestamp. */
+function nextMidnightMs(): number {
+  const d = new Date();
+  d.setUTCHours(24, 0, 0, 0);
+  return d.getTime();
+}
+
+/** Like checkRateLimit but resets at midnight UTC instead of a rolling window. */
+export function checkDailyRateLimit(
+  key: string,
+  limit: number,
+): { allowed: boolean; remaining: number; resetAt: number } {
+  const now = Date.now();
+  const midnight = nextMidnightMs();
+  const entry = store.get(key);
+
+  if (!entry || now > entry.resetAt) {
+    store.set(key, { count: 1, resetAt: midnight });
+    return { allowed: true, remaining: limit - 1, resetAt: midnight };
+  }
+
+  if (entry.count >= limit) {
+    return { allowed: false, remaining: 0, resetAt: entry.resetAt };
+  }
+
+  entry.count++;
+  return { allowed: true, remaining: limit - entry.count, resetAt: entry.resetAt };
+}
+
 /** Extract the real client IP from Vercel/proxy headers. */
 export function getClientIp(req: Request): string {
   const xff = req.headers.get("x-forwarded-for");
