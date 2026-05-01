@@ -399,6 +399,34 @@ export function computeChartData(videos: ScrapedVideo[]): ChartData {
   return { durationPerformance, contentTypes, hookVsEngagement, viewsDistribution, engagementFunnel, postingDays, viewsTimeline };
 }
 
+export interface TopSoundtrack {
+  title: string;
+  count: number;
+  avgViews: number;
+  avgEng: number;
+  isOriginal: boolean;
+}
+
+export function computeTopSoundtracks(videos: ScrapedVideo[]): TopSoundtrack[] {
+  const map: Record<string, { views: number[]; eng: number[] }> = {};
+  for (const v of videos) {
+    const title = v.soundTrack?.trim() || "Original";
+    if (!map[title]) map[title] = { views: [], eng: [] };
+    map[title].views.push(v.views);
+    map[title].eng.push(v.engagementRate);
+  }
+  return Object.entries(map)
+    .map(([title, d]) => ({
+      title,
+      count: d.views.length,
+      avgViews: Math.round(d.views.reduce((a, b) => a + b, 0) / d.views.length),
+      avgEng: parseFloat((d.eng.reduce((a, b) => a + b, 0) / d.eng.length).toFixed(1)),
+      isOriginal: /^original|son original|original sound/i.test(title),
+    }))
+    .sort((a, b) => b.count - a.count || b.avgViews - a.avgViews)
+    .slice(0, 6);
+}
+
 export function getBenchmark(videos: ScrapedVideo[]): Benchmark {
   const withDur = videos.filter(v => v.duration > 0);
   return {

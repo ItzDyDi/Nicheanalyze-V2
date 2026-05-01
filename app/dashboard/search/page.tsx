@@ -11,11 +11,11 @@ import { TOOLTIPS } from "@/lib/tooltip-data";
 import { analyzeVideo } from "@/lib/video-analyzer";
 import dynamic from "next/dynamic";
 import {
-  PatternsSection, RecommendationsSection,
+  PatternsSection, RecommendationsSection, SoundtrackSection,
 } from "@/components/Premium/InsightsPanel";
 import {
   analyzeVideoAdvanced, detectPatterns, generateRecommendations,
-  computeChartData,
+  computeChartData, computeTopSoundtracks,
 } from "@/lib/premium-analytics";
 
 const AnalyticsCharts = dynamic(() => import("@/components/Premium/AnalyticsCharts"), { ssr: false });
@@ -519,6 +519,7 @@ function PremiumSection({ videos }: { videos: ScrapedVideo[] }) {
   const chartData     = computeChartData(videos);
   const patterns      = detectPatterns(videos);
   const recs          = generateRecommendations(videos);
+  const soundtracks   = computeTopSoundtracks(videos);
   const top3          = [...videos].sort((a, b) => b.engagementRate - a.engagementRate).slice(0, 3);
 
   return (
@@ -541,6 +542,9 @@ function PremiumSection({ videos }: { videos: ScrapedVideo[] }) {
 
         {/* Patterns */}
         <PatternsSection patterns={patterns} />
+
+        {/* Musiques */}
+        <SoundtrackSection tracks={soundtracks} />
 
         {/* Recommendations */}
         <div>
