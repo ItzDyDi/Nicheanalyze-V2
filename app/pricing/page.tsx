@@ -65,6 +65,25 @@ export default async function PricingPage() {
         <p className="text-gray-400">Commence gratuitement. Upgrade quand tu es prêt.</p>
       </div>
 
+      {/* Personalized banner if logged in */}
+      {userPlan && (
+        <div className="max-w-5xl mx-auto px-6 -mt-4 mb-2">
+          <div className="rounded-2xl px-5 py-3 flex items-center gap-3"
+            style={{ background: userPlan === "premium" ? "rgba(0,217,255,0.08)" : userPlan === "pro" ? "rgba(255,22,84,0.08)" : "rgba(255,255,255,0.04)", border: `1px solid ${userPlan === "premium" ? "rgba(0,217,255,0.2)" : userPlan === "pro" ? "rgba(255,22,84,0.2)" : "rgba(255,255,255,0.08)"}` }}>
+            <span className="text-lg">{userPlan === "premium" ? "💎" : userPlan === "pro" ? "⭐" : "🆓"}</span>
+            <p className="text-sm text-gray-300">
+              Tu es sur le plan{" "}
+              <span className="font-black" style={{ color: userPlan === "premium" ? "#00D9FF" : userPlan === "pro" ? "#FF1654" : "#94a3b8" }}>
+                {userPlan === "premium" ? "Premium" : userPlan === "pro" ? "Pro" : "Free"}
+              </span>
+              {userPlan === "premium" && " — tu profites de toutes les fonctionnalités 🎉"}
+              {userPlan === "pro" && " — upgrade vers Premium pour les analytics avancés"}
+              {userPlan === "free" && " — upgrade vers Pro pour 10x plus de recherches"}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Plan cards */}
       <div className="max-w-5xl mx-auto px-6 py-14">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
@@ -82,6 +101,12 @@ export default async function PricingPage() {
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-white text-[11px] font-bold px-3 py-1 rounded-full whitespace-nowrap"
                     style={{ background: "#FF1654" }}>
                     {style.badge}
+                  </span>
+                )}
+                {userPlan === key && (
+                  <span className="absolute -top-3 right-4 text-[11px] font-black px-3 py-1 rounded-full whitespace-nowrap"
+                    style={{ background: key === "premium" ? "#00D9FF" : key === "pro" ? "#FF1654" : "#94a3b8", color: "#fff" }}>
+                    ✦ Mon plan
                   </span>
                 )}
 

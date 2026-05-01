@@ -43,10 +43,11 @@ export default function CheckoutButton({ plan, label, className, style }: Props)
   }
 
   if (isCurrent) {
+    const color = plan === "premium" ? "#00D9FF" : "#FF1654";
     return (
       <div
-        className="block w-full text-center py-2.5 rounded-xl text-sm font-bold mb-6 cursor-default"
-        style={{ background: "rgba(255,255,255,0.08)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)" }}
+        className="block w-full text-center py-2.5 rounded-xl text-sm font-black mb-6 cursor-default"
+        style={{ background: `${color}18`, color, border: `1.5px solid ${color}50` }}
       >
         ✓ Votre abonnement actuel
       </div>
