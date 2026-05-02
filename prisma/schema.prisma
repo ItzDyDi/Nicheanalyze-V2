@@ -28,6 +28,8 @@ model User {
   stripePriceId        String?
   subscriptionStatus   String?
   subscriptionEnd      DateTime?
+  searchCount          Int       @default(0)
+  searchResetAt        DateTime  @default(now())
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 }

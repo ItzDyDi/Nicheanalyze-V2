@@ -3,6 +3,41 @@ import { PLANS } from "@/lib/plan-limits";
 import { searchTikTok, calculateStats, getTopHashtags, getTopHooks } from "@/lib/tiktok-scraper";
 import { detectLanguage } from "@/lib/language-detector";
 import { checkRateLimit, checkDailyRateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
+import { prisma } from "@/lib/prisma";
+
+function nextMidnightUTC(): Date {
+  const d = new Date();
+  d.setUTCHours(24, 0, 0, 0);
+  return d;
+}
+
+async function checkDbDailyLimit(userId: string, limit: number): Promise<{ allowed: boolean; resetAt: Date }> {
+  const now = new Date();
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { searchCount: true, searchResetAt: true },
+  });
+  if (!user) return { allowed: false, resetAt: nextMidnightUTC() };
+
+  // Reset counter if past midnight
+  if (now >= user.searchResetAt) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { searchCount: 1, searchResetAt: nextMidnightUTC() },
+    });
+    return { allowed: true, resetAt: nextMidnightUTC() };
+  }
+
+  if (user.searchCount >= limit) {
+    return { allowed: false, resetAt: user.searchResetAt };
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { searchCount: { increment: 1 } },
+  });
+  return { allowed: true, resetAt: user.searchResetAt };
+}
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -33,12 +68,12 @@ export async function GET(request: Request) {
       return rateLimitResponse(burstCheck.resetAt, "Une recherche à la fois. Attends quelques secondes.");
     }
 
-    // Rate limit journalière selon le plan, reset à minuit UTC
+    // Rate limit journalière selon le plan — stockée en DB (résiste aux cold starts Vercel)
     const dailyLimit = plan === "free" ? 5 : plan === "pro" ? 50 : 500;
-    const dailyCheck = checkDailyRateLimit(`search-daily:${userId}`, dailyLimit);
+    const dailyCheck = await checkDbDailyLimit(userId, dailyLimit);
     if (!dailyCheck.allowed) {
       return rateLimitResponse(
-        dailyCheck.resetAt,
+        dailyCheck.resetAt.getTime(),
         plan === "free"
           ? "Limite de 5 recherches/jour atteinte. Upgrade vers Pro pour plus."
           : "Limite journalière atteinte.",
