@@ -132,26 +132,26 @@ export default function AnalyticsCharts({ data }: { data: ChartData }) {
         </ResponsiveContainer>
       </ChartCard>
 
-      {/* Chart 5: Courbe vues par type de contenu */}
-      <ChartCard title="Courbe vues × engagement par type" subtitle="Performance croisée selon le format">
-        <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={data.contentTypes} margin={{ top: 0, right: 10, left: -10, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-            <XAxis dataKey="type" tick={{ fill: "#9ca3af", fontSize: 10 }} axisLine={false} tickLine={false} />
-            <YAxis yAxisId="left" tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false}
-              tickFormatter={(v: number) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
-            <YAxis yAxisId="right" orientation="right" tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} unit="%" />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 11, color: "#9ca3af" }} />
-            <Line yAxisId="left" type="monotone" dataKey="avgViews" name="Vues moy."
-              stroke="#FF1654" strokeWidth={2} dot={{ fill: "#FF1654", r: 4 }} activeDot={{ r: 6 }} />
-            <Line yAxisId="right" type="monotone" dataKey="avgEng" name="Engagement %"
-              stroke="#00D9FF" strokeWidth={2} dot={{ fill: "#00D9FF", r: 4 }} activeDot={{ r: 6 }} strokeDasharray="4 2" />
-          </LineChart>
-        </ResponsiveContainer>
-      </ChartCard>
-
     </div>
+
+    {/* Chart 5: Courbe vues × engagement — pleine largeur */}
+    <ChartCard title="Courbe vues × engagement par type" subtitle="Performance croisée selon le format">
+      <ResponsiveContainer width="100%" height={240}>
+        <LineChart data={data.contentTypes} margin={{ top: 0, right: 16, left: -10, bottom: 8 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+          <XAxis dataKey="type" tick={{ fill: "#e5e7eb", fontSize: 12, fontWeight: 500 }} axisLine={false} tickLine={false} />
+          <YAxis yAxisId="left" tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false}
+            tickFormatter={(v: number) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
+          <YAxis yAxisId="right" orientation="right" tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} unit="%" />
+          <Tooltip content={<CustomTooltip />} />
+          <Legend wrapperStyle={{ fontSize: 12, color: "#9ca3af" }} />
+          <Line yAxisId="left" type="monotone" dataKey="avgViews" name="Vues moy."
+            stroke="#FF1654" strokeWidth={2.5} dot={{ fill: "#FF1654", r: 4 }} activeDot={{ r: 6 }} />
+          <Line yAxisId="right" type="monotone" dataKey="avgEng" name="Engagement %"
+            stroke="#00D9FF" strokeWidth={2.5} dot={{ fill: "#00D9FF", r: 4 }} activeDot={{ r: 6 }} strokeDasharray="4 2" />
+        </LineChart>
+      </ResponsiveContainer>
+    </ChartCard>
 
     {/* ── Section 2 : Dashboard style Coupler ── */}
     <div className="space-y-4 mt-4">
