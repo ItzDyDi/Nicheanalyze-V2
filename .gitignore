@@ -51,3 +51,6 @@ prisma/dev.db-journal
 # Avatars uploadés (fichiers utilisateurs locaux)
 /public/avatars/*
 !/public/avatars/.gitkeep
+
+# Claude Code — permissions locales (contient des clés API)
+.claude/settings.local.json
