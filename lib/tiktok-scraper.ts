@@ -121,9 +121,9 @@ export async function searchTikTok(
 
   console.log(`[TikTok] lang=${lang} | query="${keyword}" → enhanced="${enhancedKeyword}" | limit=${limit}`);
 
-  // TikTok renvoie max ~20 résultats par page — on pagine jusqu'à avoir assez
-  const PER_PAGE = 20;
-  const maxPages = Math.min(Math.ceil(limit / PER_PAGE), 6); // max 6 pages (120 vidéos)
+  // TikTok renvoie max ~30 résultats par page — on pagine jusqu'à avoir assez
+  const PER_PAGE = 30;
+  const maxPages = Math.min(Math.ceil(limit / PER_PAGE), 5); // max 5 pages (150 vidéos)
   const allItems: unknown[] = [];
   let cursor = 0;
 
@@ -132,7 +132,7 @@ export async function searchTikTok(
 
     const res = await fetch(url, {
       headers: { "x-rapidapi-key": key, "x-rapidapi-host": host },
-      next: { revalidate: 300 },
+      cache: "no-store",
     });
 
     if (!res.ok) {
