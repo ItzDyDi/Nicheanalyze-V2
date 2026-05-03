@@ -91,7 +91,7 @@ export default function AccountPage() {
         {/* Profile card */}
         <div className="bg-gray-800 rounded-2xl border border-gray-700 p-6 relative">
 
-          <div className="flex items-start gap-4">
+          <div className="flex items-center gap-4">
             {/* Avatar with upload */}
             <div className="relative group">
               <button
@@ -178,12 +178,12 @@ export default function AccountPage() {
               </button>
             </div>
 
-            {/* Plan icon — inline in row, no border */}
+            {/* Plan icon */}
             {plan !== "free" && meta.icon && (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={meta.icon} alt={meta.label}
-                className="rounded-2xl shrink-0 ml-auto"
-                style={{ width: 160, height: 160, objectFit: "fill", display: "block" }} />
+                className="rounded-xl shrink-0"
+                style={{ width: 72, height: 72, objectFit: "fill" }} />
             )}
 
           </div>
