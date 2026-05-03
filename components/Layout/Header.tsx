@@ -36,9 +36,10 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const plan     = (session?.user as { plan?: string })?.plan ?? "free";
-  const icon     = planIcon(plan);
-  const planName = plan === "premium" ? "Premium" : plan === "pro" ? "Pro" : "Free";
+  const plan      = (session?.user as { plan?: string })?.plan ?? "free";
+  const icon      = planIcon(plan);
+  const planName  = plan === "premium" ? "Premium" : plan === "pro" ? "Pro" : "Free";
+  const planColor = plan === "premium" ? "#00D9FF" : plan === "pro" ? "#FF1654" : "#94a3b8";
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
@@ -93,16 +94,20 @@ export default function Header() {
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-[calc(100vw-1rem)] sm:w-56 max-w-[224px] bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-50">
                   <div className="px-4 py-2.5 border-b border-gray-100">
-                    <p className="text-gray-900 text-sm font-medium truncate">
-                      {session.user?.name ?? "Utilisateur"}
-                    </p>
-                    <p className="text-gray-500 text-xs truncate">{session.user?.email}</p>
-                    <div className="flex items-center gap-1.5 mt-1.5">
-                      {icon && <Image src={icon} alt={planName} width={16} height={16} className="object-contain rounded" />}
-                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-500">
-                        Plan {planName}
-                      </span>
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-gray-900 text-sm font-medium truncate">
+                        {session.user?.name ?? "Utilisateur"}
+                      </p>
+                      {icon && (
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Image src={icon} alt={planName} width={14} height={14} className="object-contain rounded" />
+                          <span className="text-xs font-bold" style={{ color: planColor }}>
+                            {planName}
+                          </span>
+                        </div>
+                      )}
                     </div>
+                    <p className="text-gray-500 text-xs truncate">{session.user?.email}</p>
                   </div>
 
                   <Link href="/account" onClick={() => setDropdownOpen(false)}
