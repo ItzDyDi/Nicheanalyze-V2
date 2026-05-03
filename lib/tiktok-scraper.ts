@@ -119,27 +119,40 @@ export async function searchTikTok(
   const lang = langOverride ?? detectLanguage(keyword);
   const enhancedKeyword = enhanceQuery(keyword, lang, niche as "pet-wellness" | "diy-home" | "education" | "general");
 
-  console.log(`[TikTok] lang=${lang} | query="${keyword}" → enhanced="${enhancedKeyword}"`);
+  console.log(`[TikTok] lang=${lang} | query="${keyword}" → enhanced="${enhancedKeyword}" | limit=${limit}`);
 
-  const url = `https://${host}/api/search/video?keyword=${encodeURIComponent(enhancedKeyword)}&count=${limit}&cursor=0`;
+  // TikTok renvoie max ~20 résultats par page — on pagine jusqu'à avoir assez
+  const PER_PAGE = 20;
+  const maxPages = Math.min(Math.ceil(limit / PER_PAGE), 6); // max 6 pages (120 vidéos)
+  const allItems: unknown[] = [];
+  let cursor = 0;
 
-  const res = await fetch(url, {
-    headers: {
-      "x-rapidapi-key": key,
-      "x-rapidapi-host": host,
-    },
-    next: { revalidate: 300 },
-  });
+  for (let page = 0; page < maxPages && allItems.length < limit; page++) {
+    const url = `https://${host}/api/search/video?keyword=${encodeURIComponent(enhancedKeyword)}&count=${PER_PAGE}&cursor=${cursor}`;
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`RapidAPI ${res.status}: ${text.slice(0, 200)}`);
+    const res = await fetch(url, {
+      headers: { "x-rapidapi-key": key, "x-rapidapi-host": host },
+      next: { revalidate: 300 },
+    });
+
+    if (!res.ok) {
+      if (page === 0) {
+        const text = await res.text();
+        throw new Error(`RapidAPI ${res.status}: ${text.slice(0, 200)}`);
+      }
+      break; // pages suivantes : échec silencieux
+    }
+
+    const data = await res.json();
+    const items: unknown[] = data?.item_list ?? [];
+    if (items.length === 0) break;
+
+    allItems.push(...items);
+    cursor = typeof data?.cursor === "number" ? data.cursor : cursor + PER_PAGE;
+    if (!data?.has_more) break;
   }
 
-  const data = await res.json();
-  const items: unknown[] = data?.item_list ?? [];
-
-  const all = items.map((item) => mapItem(item, niche));
+  const all = allItems.map((item) => mapItem(item, niche));
 
   // Filter by language if explicitly requested (fr or en)
   if (lang === "fr" || lang === "en") {

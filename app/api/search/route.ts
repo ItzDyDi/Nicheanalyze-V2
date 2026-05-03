@@ -93,9 +93,7 @@ export async function GET(request: Request) {
   const niche = searchParams.get("niche") ?? "general";
   const langParam = searchParams.get("lang") as "fr" | "en" | "other" | null;
 
-  const maxVideos = planConfig.videosPerSearch;
-  const requested = Math.min(Number(searchParams.get("limit") ?? "20"), 50);
-  const limit = Math.min(requested, maxVideos);
+  const limit = planConfig.videosPerSearch;
 
   if (!keyword.trim()) {
     return Response.json({ success: false, error: "keyword requis" }, { status: 400 });
