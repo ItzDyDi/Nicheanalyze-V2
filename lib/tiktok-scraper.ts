@@ -149,7 +149,7 @@ export async function searchTikTok(
 
     allItems.push(...items);
     cursor = typeof data?.cursor === "number" ? data.cursor : cursor + PER_PAGE;
-    if (!data?.has_more) break;
+    if (data?.has_more === false) break; // ne break que si l'API dit explicitement "plus rien"
   }
 
   const all = allItems.map((item) => mapItem(item, niche));
@@ -160,8 +160,9 @@ export async function searchTikTok(
       const detected = detectLanguage(`${v.hook} ${v.hashtags.join(" ")}`);
       return detected === lang || detected === "other";
     });
-    // Fallback to unfiltered if too few results
-    const result = filtered.length >= 3 ? filtered : all;
+    // Fallback to unfiltered si le filtre langue retire trop de résultats (< 30% du limit)
+    const minFiltered = Math.max(3, Math.floor(limit * 0.3));
+    const result = filtered.length >= minFiltered ? filtered : all;
     return result.slice(0, limit);
   }
 
