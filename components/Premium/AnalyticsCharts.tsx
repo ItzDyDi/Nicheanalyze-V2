@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ScatterChart, Scatter, Cell, Legend, LineChart, Line,
@@ -14,10 +15,19 @@ function fmtVal(v: number): string {
   return v.toString();
 }
 
-function ChartCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
+function ChartCard({ title, subtitle, children, onExpand }: { title: string; subtitle?: string; children: React.ReactNode; onExpand?: () => void }) {
   return (
     <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-      <p className="text-white font-bold text-sm mb-0.5">{title}</p>
+      <div className="flex items-start justify-between mb-0.5">
+        <p className="text-white font-bold text-sm">{title}</p>
+        {onExpand && (
+          <button onClick={onExpand} title="Agrandir"
+            className="text-gray-500 hover:text-white transition-colors ml-2 shrink-0"
+            style={{ fontSize: 15, lineHeight: 1 }}>
+            ⛶
+          </button>
+        )}
+      </div>
       {subtitle && <p className="text-gray-500 text-xs mb-4">{subtitle}</p>}
       {!subtitle && <div className="mb-4" />}
       {children}
@@ -38,7 +48,33 @@ function CustomTooltip({ active, payload, label }: any) {
   );
 }
 
+function TimelineChart({ data, height }: { data: ChartData["viewsTimeline"]; height: number }) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <LineChart data={data} margin={{ top: 4, right: 16, left: -10, bottom: 0 }}>
+        <defs>
+          <linearGradient id="timelineGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#FF1654" stopOpacity={0.15} />
+            <stop offset="95%" stopColor="#FF1654" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+        <XAxis dataKey="label" tick={{ fill: "#9ca3af", fontSize: 10 }} axisLine={false} tickLine={false} />
+        <YAxis tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false}
+          tickFormatter={(v: number) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
+        <Tooltip content={<CustomTooltip />} />
+        <Legend wrapperStyle={{ fontSize: 11, color: "#9ca3af" }} />
+        <Line type="monotone" dataKey="views" name="Vues moy."
+          stroke="#FF1654" strokeWidth={2.5} dot={{ fill: "#FF1654", r: 4, strokeWidth: 0 }} activeDot={{ r: 6 }} />
+        <Line type="monotone" dataKey="likes" name="Likes moy."
+          stroke="#00D9FF" strokeWidth={2} dot={{ fill: "#00D9FF", r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} strokeDasharray="4 2" />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+}
+
 export default function AnalyticsCharts({ data }: { data: ChartData }) {
+  const [timelineOpen, setTimelineOpen] = useState(false);
   return (
     <div className="space-y-4">
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -213,27 +249,8 @@ export default function AnalyticsCharts({ data }: { data: ChartData }) {
 
         {/* Timeline vues + likes */}
         {data.viewsTimeline.length >= 2 ? (
-          <ChartCard title="Timeline des publications" subtitle="Vues et likes moyens par semaine">
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={data.viewsTimeline} margin={{ top: 4, right: 10, left: -10, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="timelineGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#FF1654" stopOpacity={0.15} />
-                    <stop offset="95%" stopColor="#FF1654" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="label" tick={{ fill: "#9ca3af", fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false}
-                  tickFormatter={(v: number) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend wrapperStyle={{ fontSize: 11, color: "#9ca3af" }} />
-                <Line type="monotone" dataKey="views" name="Vues moy."
-                  stroke="#FF1654" strokeWidth={2.5} dot={{ fill: "#FF1654", r: 4, strokeWidth: 0 }} activeDot={{ r: 6 }} />
-                <Line type="monotone" dataKey="likes" name="Likes moy."
-                  stroke="#00D9FF" strokeWidth={2} dot={{ fill: "#00D9FF", r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} strokeDasharray="4 2" />
-              </LineChart>
-            </ResponsiveContainer>
+          <ChartCard title="Timeline des publications" subtitle="Vues et likes moyens par semaine" onExpand={() => setTimelineOpen(true)}>
+            <TimelineChart data={data.viewsTimeline} height={200} />
           </ChartCard>
         ) : (
           <ChartCard title="Timeline des publications" subtitle="Vues et likes moyens par semaine">
@@ -241,6 +258,27 @@ export default function AnalyticsCharts({ data }: { data: ChartData }) {
               <p className="text-gray-600 text-xs text-center">Données insuffisantes<br/>(les vidéos doivent avoir des dates de publication variées)</p>
             </div>
           </ChartCard>
+        )}
+
+        {/* Modal plein écran Timeline */}
+        {timelineOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8"
+            style={{ background: "rgba(0,0,0,0.85)" }}
+            onClick={() => setTimelineOpen(false)}>
+            <div className="w-full max-w-5xl rounded-2xl p-6"
+              style={{ background: "#0d1117", border: "1px solid rgba(255,255,255,0.1)" }}
+              onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-white font-bold text-base">Timeline des publications</p>
+                <button onClick={() => setTimelineOpen(false)}
+                  className="text-gray-500 hover:text-white transition-colors text-xl leading-none">
+                  ✕
+                </button>
+              </div>
+              <p className="text-gray-500 text-xs mb-5">Vues et likes moyens par semaine</p>
+              <TimelineChart data={data.viewsTimeline} height={420} />
+            </div>
+          </div>
         )}
 
       </div>
