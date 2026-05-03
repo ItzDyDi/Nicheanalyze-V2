@@ -103,7 +103,7 @@ export default function Header() {
                           <span className="text-sm font-bold" style={{ color: planColor }}>
                             {planName}
                           </span>
-                          <Image src={icon} alt={planName} width={18} height={18} className="object-contain rounded" />
+                          <Image src={icon} alt={planName} width={22} height={22} className="object-contain rounded" />
                         </div>
                       )}
                     </div>
