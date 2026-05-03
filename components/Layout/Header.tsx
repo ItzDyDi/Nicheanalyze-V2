@@ -99,11 +99,11 @@ export default function Header() {
                         {session.user?.name ?? "Utilisateur"}
                       </p>
                       {icon && (
-                        <div className="flex items-center gap-1 shrink-0">
-                          <Image src={icon} alt={planName} width={14} height={14} className="object-contain rounded" />
-                          <span className="text-xs font-bold" style={{ color: planColor }}>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className="text-sm font-bold" style={{ color: planColor }}>
                             {planName}
                           </span>
+                          <Image src={icon} alt={planName} width={18} height={18} className="object-contain rounded" />
                         </div>
                       )}
                     </div>
